@@ -51,7 +51,53 @@ pip install -r requirements.txt
 
 Edit `config.yaml`: API endpoints, data paths, logging, and optional `community_names` (aliases and URL path slugs for normalization).
 
+## Quick Start
+
+### 1. Install Python dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Run the backend pipeline
+
+From the repository root:
+
+```bash
+python -m src.main
+```
+
+This generates the latest output files under `data/output/`, including:
+
+- `final_dataframe.csv`
+- `pipeline_analysis_report.html`
+- `pipeline_steps_report.json`
+- `pipeline_runtime_status.json`
+
+### 3. Start the front-end UI
+
+The repository also includes a React front-end under `frontend/` for the pipeline tour, the live step-by-step demo, and the integration/governance explanation pages.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then open the local URL printed by Vite (typically **`http://127.0.0.1:5173/`**).
+
+### 4. Use the live pipeline demo
+
+To see the latest real pipeline output in **`/live-demo`**, run the backend pipeline first as shown above. The front-end reads:
+
+- `data/output/pipeline_steps_report.json`
+- `data/output/pipeline_runtime_status.json`
+
+You can also start the backend pipeline directly from the front-end home page using the **Start backend pipeline** button.
+
 ## Running
+
+If you only want to run the backend pipeline without the front-end:
 
 ```bash
 python src/main.py

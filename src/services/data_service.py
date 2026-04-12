@@ -1,11 +1,15 @@
 """
 Data service for business logic related to data operations.
 """
+import logging
 import pandas as pd
 from typing import List, Optional
 from ..core.interfaces import IDataProcessor
 from ..core.exceptions import DataProcessError
+from ..core.pipeline_reporter import dataframe_snapshot, log_internal_transition
 from ..repositories import FileRepository, APIRepository
+
+_logger = logging.getLogger(__name__)
 
 
 class DataService:
@@ -42,8 +46,14 @@ class DataService:
         try:
             sales_list = self.file_repository.load_all_sales_data()
             merged = self.data_processor.merge_dataframes(sales_list)
+            snap_m = dataframe_snapshot(merged, "sales_merged")
             cleaned = self.data_processor.clean_data(merged)
-            return self.data_processor.process_sales_data(cleaned)
+            snap_c = dataframe_snapshot(cleaned, "sales_cleaned")
+            log_internal_transition(_logger, "sales", "merge → clean", snap_m, snap_c)
+            out = self.data_processor.process_sales_data(cleaned)
+            snap_o = dataframe_snapshot(out, "sales_final")
+            log_internal_transition(_logger, "sales", "clean → process_sales_data", snap_c, snap_o)
+            return out
         except Exception as e:
             raise DataProcessError(f"Failed to load and process sales data: {e}")
     
@@ -60,8 +70,14 @@ class DataService:
         try:
             targets_list = self.file_repository.load_all_targets_data()
             merged = self.data_processor.merge_dataframes(targets_list)
+            snap_m = dataframe_snapshot(merged, "targets_merged")
             cleaned = self.data_processor.clean_data(merged)
-            return self.data_processor.process_targets_data(cleaned)
+            snap_c = dataframe_snapshot(cleaned, "targets_cleaned")
+            log_internal_transition(_logger, "targets", "merge → clean", snap_m, snap_c)
+            out = self.data_processor.process_targets_data(cleaned)
+            snap_o = dataframe_snapshot(out, "targets_final")
+            log_internal_transition(_logger, "targets", "clean → process_targets_data", snap_c, snap_o)
+            return out
         except Exception as e:
             raise DataProcessError(f"Failed to load and process targets data: {e}")
     
@@ -83,8 +99,6 @@ class DataService:
             if not crm_list:
                 return pd.DataFrame()
             
-            # Log raw records count before merging
-            import logging
             logger = logging.getLogger(__name__)
             total_raw = sum(len(df) for df in crm_list)
             logger.info(
@@ -112,7 +126,6 @@ class DataService:
             return processed
         except Exception as e:
             # Log warning but return empty DataFrame (graceful degradation)
-            import logging
             logger = logging.getLogger(__name__)
             logger.warning(
                 f"Failed to load CRM data, continuing with empty DataFrame: {e}",
@@ -152,7 +165,6 @@ class DataService:
             return self.data_processor.process_web_traffic_data(merged)
         except Exception as e:
             # Log warning but return empty DataFrame (graceful degradation)
-            import logging
             logger = logging.getLogger(__name__)
             logger.warning(
                 f"Failed to load web traffic data, continuing with empty DataFrame: {e}",

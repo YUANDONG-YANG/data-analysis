@@ -3,16 +3,26 @@ Pipeline service orchestrating the entire data processing workflow.
 """
 import pandas as pd
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import logging
 import time
 import os
 import hashlib
+from datetime import datetime
 
 from .data_service import DataService
 from .metrics_service import MetricsService
 from ..core.config import AppConfig
 from ..core.exceptions import DataIntegrationError
+from ..core.pipeline_reporter import (
+    dataframe_snapshot,
+    dataframe_to_preview_dict,
+    input_bundle_snapshot,
+    log_step_compare,
+    write_pipeline_analysis_html,
+    write_pipeline_runtime_status_json,
+    write_pipeline_steps_json,
+)
 from ..core.structured_logger import PerformanceLogger
 
 
@@ -56,7 +66,45 @@ class PipelineService:
             DataIntegrationError: If pipeline execution fails
         """
         pipeline_start_time = time.time()
-        
+        step_entries: List[Dict[str, Any]] = []
+        empty_before = dataframe_snapshot(pd.DataFrame(), "pipeline_empty")
+        runtime_started_at = datetime.now().isoformat(timespec="seconds")
+
+        def persist_runtime_status(
+            status: str,
+            current_step: Optional[str] = None,
+            current_title: Optional[str] = None,
+            total_seconds: Optional[float] = None,
+            finished_at: Optional[str] = None,
+            output_csv: Optional[str] = None,
+            output_checksum_md5: Optional[str] = None,
+            quality_report: Optional[Dict[str, Any]] = None,
+            error: Optional[Dict[str, Any]] = None,
+        ) -> None:
+            try:
+                write_pipeline_runtime_status_json(
+                    self.output_path,
+                    self.pipeline_id,
+                    self.run_mode,
+                    self.environment,
+                    status,
+                    runtime_started_at,
+                    step_entries,
+                    current_step=current_step,
+                    current_title=current_title,
+                    total_seconds=total_seconds,
+                    finished_at=finished_at,
+                    output_csv=output_csv,
+                    output_checksum_md5=output_checksum_md5,
+                    quality_report=quality_report,
+                    error=error,
+                )
+            except OSError as exc:
+                self.logger.warning(
+                    f"Could not write pipeline runtime status JSON: {exc}",
+                    extra={'context': {'pipeline_id': self.pipeline_id, 'step': 'pipeline_runtime_status_error'}},
+                )
+
         try:
             self.logger.info(
                 "Starting data integration pipeline",
@@ -69,8 +117,11 @@ class PipelineService:
                     }
                 }
             )
+            persist_runtime_status("starting")
             
             # Step 1: Load and process sales data
+            t_step = time.time()
+            persist_runtime_status("running", "1/6", "Load and process sales")
             with self.perf_logger.time_operation("load_and_process_sales_data"):
                 self.logger.info(
                     "Step 1/6: Loading and processing sales data",
@@ -98,8 +149,26 @@ class PipelineService:
                         }
                     }
                 )
-            
+            after1 = dataframe_snapshot(sales_df, "sales_processed")
+            dur1 = time.time() - t_step
+            log_step_compare(
+                self.logger, self.pipeline_id, "1/6", "Load and process sales",
+                empty_before, after1, dur1,
+            )
+            step_entries.append({
+                "step": "1/6",
+                "title": "Load and process sales",
+                "before": empty_before,
+                "after": after1,
+                "duration_sec": dur1,
+                "delta_display": f"+{after1['rows']} rows (from empty pipeline)",
+                "output_preview": dataframe_to_preview_dict(sales_df, 15),
+            })
+            persist_runtime_status("running", "1/6", "Load and process sales")
+
             # Step 2: Load and process targets data
+            t_step = time.time()
+            persist_runtime_status("running", "2/6", "Load and process targets")
             with self.perf_logger.time_operation("load_and_process_targets_data"):
                 self.logger.info(
                     "Step 2/6: Loading and processing targets data",
@@ -128,8 +197,24 @@ class PipelineService:
                         }
                     }
                 )
-            
+            before2 = dataframe_snapshot(sales_df, "context_after_step1_sales")
+            after2 = dataframe_snapshot(targets_df, "targets_processed")
+            dur2 = time.time() - t_step
+            log_step_compare(self.logger, self.pipeline_id, "2/6", "Load and process targets", before2, after2, dur2)
+            step_entries.append({
+                "step": "2/6",
+                "title": "Load and process targets",
+                "before": before2,
+                "after": after2,
+                "duration_sec": dur2,
+                "delta_display": f"targets={after2['rows']} rows (sales still {before2['rows']} rows)",
+                "output_preview": dataframe_to_preview_dict(targets_df, 15),
+            })
+            persist_runtime_status("running", "2/6", "Load and process targets")
+
             # Step 3: Load and process CRM data
+            t_step = time.time()
+            persist_runtime_status("running", "3/6", "Load and process CRM")
             with self.perf_logger.time_operation("load_and_process_crm_data"):
                 self.logger.info(
                     "Step 3/6: Loading and processing CRM data",
@@ -147,8 +232,24 @@ class PipelineService:
                         }
                     }
                 )
-            
+            before3 = dataframe_snapshot(targets_df, "context_after_step2_targets")
+            after3 = dataframe_snapshot(crm_df, "crm_processed")
+            dur3 = time.time() - t_step
+            log_step_compare(self.logger, self.pipeline_id, "3/6", "Load and process CRM", before3, after3, dur3)
+            step_entries.append({
+                "step": "3/6",
+                "title": "Load and process CRM",
+                "before": before3,
+                "after": after3,
+                "duration_sec": dur3,
+                "delta_display": f"crm={after3['rows']} rows (targets context {before3['rows']} rows)",
+                "output_preview": dataframe_to_preview_dict(crm_df, 15),
+            })
+            persist_runtime_status("running", "3/6", "Load and process CRM")
+
             # Step 4: Load and process web traffic data
+            t_step = time.time()
+            persist_runtime_status("running", "4/6", "Load and process web traffic")
             with self.perf_logger.time_operation("load_and_process_web_traffic_data"):
                 self.logger.info(
                     "Step 4/6: Loading and processing web traffic data",
@@ -166,8 +267,24 @@ class PipelineService:
                         }
                     }
                 )
-            
+            before4 = dataframe_snapshot(crm_df, "context_after_step3_crm")
+            after4 = dataframe_snapshot(web_traffic_df, "web_traffic_processed")
+            dur4 = time.time() - t_step
+            log_step_compare(self.logger, self.pipeline_id, "4/6", "Load and process web traffic", before4, after4, dur4)
+            step_entries.append({
+                "step": "4/6",
+                "title": "Load and process web traffic",
+                "before": before4,
+                "after": after4,
+                "duration_sec": dur4,
+                "delta_display": f"web_traffic={after4['rows']} rows (crm context {before4['rows']} rows)",
+                "output_preview": dataframe_to_preview_dict(web_traffic_df, 15),
+            })
+            persist_runtime_status("running", "4/6", "Load and process web traffic")
+
             # Step 5: Calculate metrics
+            t_step = time.time()
+            persist_runtime_status("running", "5/6", "Calculate metrics")
             with self.perf_logger.time_operation("calculate_metrics"):
                 self.logger.info(
                     "Step 5/6: Calculating metrics",
@@ -210,15 +327,49 @@ class PipelineService:
                         }
                     }
                 )
-            
+            bundle_before = input_bundle_snapshot(sales_df, targets_df, crm_df, web_traffic_df)
+            after5 = dataframe_snapshot(metrics_df, "metrics_calculated")
+            dur5 = time.time() - t_step
+            log_step_compare(self.logger, self.pipeline_id, "5/6", "Calculate metrics", bundle_before, after5, dur5)
+            step_entries.append({
+                "step": "5/6",
+                "title": "Calculate metrics (join inputs → metrics)",
+                "before": bundle_before,
+                "after": after5,
+                "duration_sec": dur5,
+                "delta_display": f"Σ_input_rows={bundle_before['sum_rows']} → metrics_rows={after5['rows']}",
+                "output_preview": dataframe_to_preview_dict(metrics_df, 15),
+                "conversion_stats": conversion_stats,
+            })
+            persist_runtime_status("running", "5/6", "Calculate metrics")
+
             # Step 6: Save results
+            t_step = time.time()
+            before6 = dataframe_snapshot(metrics_df, "metrics_before_save")
+            persist_runtime_status("running", "6/6", "Save results")
             with self.perf_logger.time_operation("save_results"):
                 self.logger.info(
                     "Step 6/6: Saving results",
                     extra={'context': {'pipeline_id': self.pipeline_id, 'step': '6/6', 'step_name': 'save_results'}}
                 )
-                self._save_results(metrics_df)
-            
+                save_meta = self._save_results(metrics_df)
+            metrics_df = save_meta["metrics_df"]
+            dur6 = time.time() - t_step
+            after6 = dict(dataframe_snapshot(metrics_df, "metrics_saved_csv"))
+            after6["saved_file"] = save_meta["filename"]
+            after6["output_checksum_md5"] = save_meta["checksum"]
+            log_step_compare(self.logger, self.pipeline_id, "6/6", "Save results (CSV + report)", before6, after6, dur6)
+            step_entries.append({
+                "step": "6/6",
+                "title": "Save results (sorted CSV + HTML analysis)",
+                "before": before6,
+                "after": after6,
+                "duration_sec": dur6,
+                "delta_display": f"rows={after6['rows']} written; MD5={save_meta['checksum'][:12]}…",
+                "output_preview": dataframe_to_preview_dict(metrics_df, 15),
+            })
+            persist_runtime_status("running", "6/6", "Save results")
+
             # Generate quality report
             quality_report = self.metrics_service.generate_quality_report(metrics_df, targets_df)
             total_time = time.time() - pipeline_start_time
@@ -265,7 +416,76 @@ class PipelineService:
                     'quality_metrics': quality_report
                 }
             )
-            
+
+            try:
+                report_path = write_pipeline_analysis_html(
+                    self.output_path,
+                    self.pipeline_id,
+                    self.run_mode,
+                    self.environment,
+                    step_entries,
+                    metrics_df,
+                    save_meta["filename"],
+                    save_meta["checksum"],
+                    quality_report=quality_report,
+                    total_seconds=total_time,
+                    preview_rows=40,
+                )
+                self.logger.info(
+                    f"Pipeline analysis HTML written: {report_path.name}",
+                    extra={
+                        'context': {
+                            'pipeline_id': self.pipeline_id,
+                            'step': 'analysis_html',
+                            'path': str(report_path),
+                        }
+                    },
+                )
+            except OSError as exc:
+                self.logger.warning(
+                    f"Could not write pipeline analysis HTML: {exc}",
+                    extra={'context': {'pipeline_id': self.pipeline_id, 'step': 'analysis_html_error'}},
+                )
+
+            try:
+                json_path = write_pipeline_steps_json(
+                    self.output_path,
+                    self.pipeline_id,
+                    self.run_mode,
+                    self.environment,
+                    total_time,
+                    step_entries,
+                    save_meta["filename"],
+                    save_meta["checksum"],
+                    quality_report=quality_report,
+                )
+                self.logger.info(
+                    f"Pipeline steps JSON written: {json_path.name}",
+                    extra={
+                        'context': {
+                            'pipeline_id': self.pipeline_id,
+                            'step': 'pipeline_steps_json',
+                            'path': str(json_path),
+                        }
+                    },
+                )
+            except OSError as exc:
+                self.logger.warning(
+                    f"Could not write pipeline steps JSON: {exc}",
+                    extra={'context': {'pipeline_id': self.pipeline_id, 'step': 'pipeline_steps_json_error'}},
+                )
+
+            persist_runtime_status(
+                "completed",
+                "6/6",
+                "Save results",
+                total_seconds=total_time,
+                finished_at=datetime.now().isoformat(timespec="seconds"),
+                output_csv=save_meta["filename"],
+                output_checksum_md5=save_meta["checksum"],
+                quality_report=quality_report,
+            )
+
             return metrics_df
             
         except DataIntegrationError as e:
@@ -291,6 +511,12 @@ class PipelineService:
                     }
                 },
                 exc_info=True
+            )
+            persist_runtime_status(
+                "failed",
+                total_seconds=total_time,
+                finished_at=datetime.now().isoformat(timespec="seconds"),
+                error=error_dict,
             )
             raise
             
@@ -322,6 +548,12 @@ class PipelineService:
                 },
                 exc_info=True
             )
+            persist_runtime_status(
+                "failed",
+                total_seconds=total_time,
+                finished_at=datetime.now().isoformat(timespec="seconds"),
+                error=wrapped_error.to_dict(),
+            )
             raise wrapped_error
     
     def _calculate_conversion_rate_stats(self, metrics_df: pd.DataFrame) -> dict:
@@ -349,44 +581,41 @@ class PipelineService:
             'note': 'conversion_rate = 0 when crm_leads = 0 or actual_sales = 0'
         }
     
-    def _save_results(self, metrics_df: pd.DataFrame) -> None:
+    def _save_results(self, metrics_df: pd.DataFrame) -> Dict[str, Any]:
         """
         Save results to output file.
-        
-        Args:
-            metrics_df: Metrics DataFrame to save
+
+        Returns:
+            Dict with sorted ``metrics_df``, CSV filename, MD5 checksum, and absolute output path.
         """
+        df = metrics_df
         # Ensure proper sorting before saving: month asc, builder asc, community_name asc
-        # Only sort if DataFrame is not empty and has required columns
-        if not metrics_df.empty:
+        if not df.empty:
             sort_columns = []
             for col in ['month', 'builder', 'community_name']:
-                if col in metrics_df.columns:
+                if col in df.columns:
                     sort_columns.append(col)
-            
+
             if sort_columns:
-                metrics_df = metrics_df.sort_values(sort_columns).reset_index(drop=True)
-        
+                df = df.sort_values(sort_columns).reset_index(drop=True)
+
         output_file = self.output_path / "final_dataframe.csv"
-        csv_content = metrics_df.to_csv(index=False)
+        csv_content = df.to_csv(index=False)
         file_size = len(csv_content.encode('utf-8'))
-        
-        metrics_df.to_csv(output_file, index=False)
-        
-        # Generate output schema (field names and types)
-        schema = self._generate_output_schema(metrics_df)
-        
-        # Calculate checksum for data consistency verification
+
+        df.to_csv(output_file, index=False)
+
+        schema = self._generate_output_schema(df)
         checksum = hashlib.md5(csv_content.encode('utf-8')).hexdigest()
-        
+
         self.logger.info(
             f"Results saved successfully",
             extra={
                 'context': {
                     'pipeline_id': self.pipeline_id,
                     'output_file': str(output_file),
-                    'records_saved': len(metrics_df),
-                    'columns_saved': len(metrics_df.columns),
+                    'records_saved': len(df),
+                    'columns_saved': len(df.columns),
                     'schema': schema,
                     'output_checksum': checksum
                 },
@@ -396,6 +625,12 @@ class PipelineService:
                 }
             }
         )
+        return {
+            'metrics_df': df,
+            'filename': 'final_dataframe.csv',
+            'checksum': checksum,
+            'output_file': str(output_file),
+        }
     
     def _generate_output_schema(self, df: pd.DataFrame) -> Dict[str, str]:
         """

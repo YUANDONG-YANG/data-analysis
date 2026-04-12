@@ -52,6 +52,9 @@ data/output/*.csv
 .DS_Store
 Thumbs.db
 
+# Node (React docs UI)
+frontend/node_modules/
+
 # MkDocs output
 site/
 
