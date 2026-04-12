@@ -1,0 +1,81 @@
+# MkDocs site: pipeline tour + architecture (Mermaid supported)
+site_name: Real Estate Heterogeneous Data Analytics
+site_description: Heterogeneous real-estate data pipeline — documentation and architecture
+
+docs_dir: docs
+site_dir: site
+dev_addr: "127.0.0.1:8081"
+
+hooks:
+  - mkdocs_hooks.py
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - search.suggest
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - toc:
+      permalink: true
+  - attr_list
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.snippets:
+      base_path:
+        - .
+      check_paths: true
+
+plugins:
+  - search
+  - mermaid2:
+      version: "10.6.1"
+      arguments:
+        theme: neutral
+        securityLevel: loose
+
+# Nav order: pipeline flow first, then per-package architecture (included from repo paths)
+nav:
+  - Home: index.md
+  - Pipeline tour:
+      - "01 Pipeline overview": 01-pipeline-overview.md
+      - "02 Startup and configuration": 02-startup-and-config.md
+      - "03 Data ingestion": 03-data-ingestion.md
+      - "04 Cleaning and transformation": 04-cleaning-and-transformation.md
+      - "05 Metrics": 05-metrics.md
+      - "06 Orchestration and output": 06-orchestration-and-output.md
+      - "07 DI and factories": 07-di-and-factories.md
+  - Architecture (from source tree):
+      - "src/": reference/architecture-src.md
+      - "src/core/": reference/architecture-core.md
+      - "src/core/processors/": reference/architecture-processors.md
+      - "src/core/calculators/": reference/architecture-calculators.md
+      - "src/core/clients/": reference/architecture-clients.md
+      - "src/repositories/": reference/architecture-repositories.md
+      - "src/services/": reference/architecture-services.md
+      - "src/factories/": reference/architecture-factories.md
+      - "src/di/": reference/architecture-di.md
+      - "data/": reference/architecture-data.md
+  - "Project README": project-readme.md
+
+strict: true

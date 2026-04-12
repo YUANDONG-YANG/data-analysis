@@ -1,0 +1,1 @@
+--8<-- "src/services/ARCHITECTURE.md"

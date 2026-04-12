@@ -1,0 +1,1 @@
+--8<-- "src/factories/ARCHITECTURE.md"

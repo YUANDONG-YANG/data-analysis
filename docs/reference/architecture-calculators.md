@@ -1,0 +1,1 @@
+--8<-- "src/core/calculators/ARCHITECTURE.md"

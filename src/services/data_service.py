@@ -1,0 +1,168 @@
+"""
+Data service for business logic related to data operations.
+"""
+import pandas as pd
+from typing import List, Optional
+from ..core.interfaces import IDataProcessor
+from ..core.exceptions import DataProcessError
+from ..repositories import FileRepository, APIRepository
+
+
+class DataService:
+    """Service for data loading and processing operations."""
+    
+    def __init__(
+        self,
+        file_repository: FileRepository,
+        api_repository: Optional[APIRepository],
+        data_processor: IDataProcessor
+    ):
+        """
+        Initialize data service.
+        
+        Args:
+            file_repository: File-based data repository
+            api_repository: API-based data repository (optional)
+            data_processor: Data processor instance
+        """
+        self.file_repository = file_repository
+        self.api_repository = api_repository
+        self.data_processor = data_processor
+    
+    def load_and_process_sales_data(self) -> pd.DataFrame:
+        """
+        Load and process all sales data.
+        
+        Returns:
+            Processed sales DataFrame
+            
+        Raises:
+            DataProcessError: If processing fails
+        """
+        try:
+            sales_list = self.file_repository.load_all_sales_data()
+            merged = self.data_processor.merge_dataframes(sales_list)
+            cleaned = self.data_processor.clean_data(merged)
+            return self.data_processor.process_sales_data(cleaned)
+        except Exception as e:
+            raise DataProcessError(f"Failed to load and process sales data: {e}")
+    
+    def load_and_process_targets_data(self) -> pd.DataFrame:
+        """
+        Load and process all targets data.
+        
+        Returns:
+            Processed targets DataFrame
+            
+        Raises:
+            DataProcessError: If processing fails
+        """
+        try:
+            targets_list = self.file_repository.load_all_targets_data()
+            merged = self.data_processor.merge_dataframes(targets_list)
+            cleaned = self.data_processor.clean_data(merged)
+            return self.data_processor.process_targets_data(cleaned)
+        except Exception as e:
+            raise DataProcessError(f"Failed to load and process targets data: {e}")
+    
+    def load_and_process_crm_data(self) -> pd.DataFrame:
+        """
+        Load and process CRM data from API.
+        
+        Returns:
+            Processed CRM DataFrame (empty if API not available)
+            
+        Raises:
+            DataProcessError: If processing fails
+        """
+        if not self.api_repository:
+            return pd.DataFrame()
+        
+        try:
+            crm_list = self.api_repository.load_all_crm_data()
+            if not crm_list:
+                return pd.DataFrame()
+            
+            # Log raw records count before merging
+            import logging
+            logger = logging.getLogger(__name__)
+            total_raw = sum(len(df) for df in crm_list)
+            logger.info(
+                f"CRM data loaded: {len(crm_list)} builders, {total_raw} total records",
+                extra={'context': {'data_type': 'crm', 'builders': len(crm_list), 'total_raw_records': total_raw}}
+            )
+            
+            merged = self.data_processor.merge_dataframes(crm_list)
+            if merged.empty:
+                logger.warning("CRM data merged but result is empty")
+                return pd.DataFrame()
+            
+            logger.info(
+                f"CRM data merged: {len(merged)} records",
+                extra={'context': {'data_type': 'crm', 'merged_records': len(merged)}}
+            )
+            
+            processed = self.data_processor.process_crm_data(merged)
+            
+            logger.info(
+                f"CRM data processed: {len(processed)} records after processing",
+                extra={'context': {'data_type': 'crm', 'processed_records': len(processed)}}
+            )
+            
+            return processed
+        except Exception as e:
+            # Log warning but return empty DataFrame (graceful degradation)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                f"Failed to load CRM data, continuing with empty DataFrame: {e}",
+                extra={
+                    'context': {
+                        'data_type': 'crm',
+                        'error_type': type(e).__name__,
+                        'graceful_degradation': True
+                    }
+                },
+                exc_info=True
+            )
+            return pd.DataFrame()
+    
+    def load_and_process_web_traffic_data(self) -> pd.DataFrame:
+        """
+        Load and process web traffic data from API.
+        
+        Returns:
+            Processed web traffic DataFrame (empty if API not available)
+            
+        Raises:
+            DataProcessError: If processing fails
+        """
+        if not self.api_repository:
+            return pd.DataFrame()
+        
+        try:
+            traffic_list = self.api_repository.load_all_web_traffic_data()
+            if not traffic_list:
+                return pd.DataFrame()
+            
+            merged = self.data_processor.merge_dataframes(traffic_list)
+            if merged.empty:
+                return pd.DataFrame()
+            
+            return self.data_processor.process_web_traffic_data(merged)
+        except Exception as e:
+            # Log warning but return empty DataFrame (graceful degradation)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                f"Failed to load web traffic data, continuing with empty DataFrame: {e}",
+                extra={
+                    'context': {
+                        'data_type': 'web_traffic',
+                        'error_type': type(e).__name__,
+                        'graceful_degradation': True
+                    }
+                },
+                exc_info=True
+            )
+            return pd.DataFrame()

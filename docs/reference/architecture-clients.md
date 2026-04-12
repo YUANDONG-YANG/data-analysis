@@ -1,0 +1,1 @@
+--8<-- "src/core/clients/ARCHITECTURE.md"

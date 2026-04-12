@@ -1,0 +1,329 @@
+home_id,sale_contract_date,community_name,sale_type,total_sale_price,sqft
+LA-WCM-000029,2024-04-02,Willow Creek Meadows,build,468776.0,1301
+LA-OV-000253,2025-08-12,Oakridge Villas,build,901816.0,2604
+LA-MH-000270,2025-10-30,Maplewood Heights,spec,457769.0,2361
+LA-MH-000259,2025-09-02,Maplewood Heights,spec,440372.0,2468
+LA-WCM-000053,2024-05-23,Willow Creek Meadows,build,368031.0,1568
+LA-WCM-000276,2025-10-31,Willow Creek Meadows,model,435180.0,1605
+LA-MH-000039,2024-05-22,Maplewood Heights,spec,499781.0,2104
+LA-OV-000055,2024-05-21,Oakridge Villas,spec,696903.0,2656
+LA-WCM-000089,2024-08-31,Willow Creek Meadows,model,368597.0,1925
+LA-MH-000158,2025-01-17,Maplewood Heights,build,459189.0,2020
+LA-WCM-000166,2025-01-23,Willow Creek Meadows,build,381642.0,1738
+LA-OV-000114,2024-09-14,Oakridge Villas,spec,659360.0,2418
+LA-MH-000084,2024-08-19,Maplewood Heights,spec,486395.0,2199
+LA-WCM-000137,2024-11-19,Willow Creek Meadows,build,322716.0,1715
+LA-WCM-000203,2025-04-14,Willow Creek Meadows,spec,391423.0,1491
+LA-MH-000161,2025-01-13,Maplewood Heights,spec,560737.0,2118
+LA-MH-000045,2024-05-19,Maplewood Heights,build,499479.0,2248
+LA-MH-000148,2024-12-10,Maplewood Heights,spec,481688.0,1837
+LA-MH-000182,2025-02-14,Maplewood Heights,spec,523295.0,2019
+LA-MH-000180,2025-02-02,Maplewood Heights,build,454831.0,2328
+LA-WCM-000175,2025-01-22,Willow Creek Meadows,build,405825.0,50
+LA-SP-000257,2025-08-03,Sunset Pines,build,874564.0,2615
+LA-WCM-000226,2025-06-19,Willow Creek Meadows,spec,423740.0,1641
+LA-OV-000021,2024-03-04,Oakridge Villas,build,805490.0,2747
+LA-OV-000131,2024-10-07,Oakridge Villas,build,695705.0,2137
+LA-WCM-000278,2025-10-02,Willow Creek Meadows,spec,441631.0,1429
+LA-MH-000013,2024-03-13,Maplewood Heights,spec,526196.0,2422
+LA-MH-000272,2025/10/29,Maplewood Heights,spec,491419.0,2254
+LA-WCM-000212,2025-05-06,Willow Creek Meadows,spec,398841.0,1973
+LA-MH-000294,2025-12-24,Maplewood Heights,spec,533622.0,25000
+LA-MH-000135,18-11-2024,Maplewood Heights,spec,507638.0,2222
+LA-MH-000262,2025-09-11,Maplewood Heights,build,413660.0,2036
+LA-WCM-000047,2024-05-25,Willow Creek Meadows,spec,359830.0,1900
+LA-OV-000143,2024-11-15,Oakridge Villas,build,762785.0,50
+LA-WCM-000126,2024-10-23,Willow Creek Meadows,build,406089.0,1813
+LA-OV-000305,2025-12-21,Oakridge Villas,spec,809826.0,2761
+LA-OV-000216,2025-05-16,Oakridge Villas,build,732657.0,2757
+LA-WCM-000212,2025-05-06,Willow Creek Meadows,spec,399591.0,1973
+LA-MH-000095,2024-09-22,Maplewood Heights,build,468763.0,2227
+LA-MH-000209,2025-05-30,Maplewood Heights,model,496080.0,2436
+LA-SP-000308,2025-12-26,Sunset Pines,model,824244.0,2770
+LA-SP-000244,2025-07-12,Sunset Pines,spec,862971.0,3231
+LA-MH-000160,2025-01-28,Maplewood Heights,build,473976.0,1972
+LA-MH-000208,2025-05-09,Maplewood Heights,build,563923.0,2057
+LA-MH-000187,2025-03-07,Maplewood Heights,spec,486150.0,2035
+LA-MH-000062,2024-06-28,Maplewood Heights,spec,489317.0,2668
+LA-OV-000144,2024-11-04,Oakridge Villas,model,753830.0,2803
+LA-OV-000034,2024-04-07,Oakridge Villas,spec,640237.0,2965
+LA-WCM-000078,2024-07-21,Willow Creek Meadows,build,421844.0,1763
+LA-MH-000070,2024-07-29,Maplewood Heights,build,471999.0,2111
+LA-WCM-000267,2025-09-14,Willow Creek Meadows,spec,425467.0,1659
+LA-WCM-000266,2025-09-15,Willow Creek Meadows,build,381924.0,1658
+LA-WCM-000088,2024-08-25,Willow Creek Meadows,build,450790.0,1823
+LA-MH-000296,2025-12-25,Maplewood Heights,spec,462409.0,2736
+LA-WCM-000251,2025-08-03,Willow Creek Meadows,spec,352936.0,1583
+LA-WCM-000008,2024-02-21,Willow Creek Meadows,spec,427272.0,50
+LA-MH-000207,2025-05-06,Maplewood Heights,build,443787.0,2343
+LA-WCM-000079,2024-07-13,Willow Creek Meadows,build,463478.0,1723
+LA-MH-000044,2024-05-15,Maplewood Heights,spec,528155.0,1986
+LA-MH-000036,2024-05-09,Maplewood Heights,spec,523487.0,2274
+LA-OV-000155,2024-12-19,Oakridge Villas,build,661774.0,2460
+LA-MH-000233,2025-07-18,Maplewood Heights,build,457503.0,2281
+LA-MH-000269,2025-10-11,Maplewood Heights - Phase 2,spec,460799.0,2301
+LA-MH-000206,2025-05-25,Maplewood Heights,spec,524992.0,2044
+LA-WCM-000125,2024-10-30,Willow Creek Meadows,spec,371000.0,1552
+LA-MH-000136,2024-11-12,Maplewood Heights,spec,508258.0,2288
+LA-MH-000003,2024/02/28,Maplewood Heights,spec,510888.0,1722
+LA-MH-000037,2024-05-24,Maplewood Heights,spec,538430.0,2647
+LA-WCM-000066,2024-06-13,Willow Creek Meadows,spec,406967.0,1542
+LA-MH-000283,2025-11-16,Maplewood Heights,build,426620.0,2243
+LA-WCM-000031,2024-04-06,Willow Creek Meadows,spec,449182.0,1901
+LA-MH-000232,2025-07-17,Maplewood Heights,spec,492861.0,1903
+LA-MH-000247,2025-08-26,Maplewood Heights,build,473913.0,2194
+LA-MH-000163,2025-01-18,Maplewood Heights,spec,510567.0,2655
+LA-WCM-000030,2024-04-25,Willow Creek Meadows,build,372863.0,1789
+LA-OV-000010,2024-02-22,Oakridge Villas,spec,688541.0,2860
+LA-MH-000192,2025-03-09,Maplewood Heights,build,536832.0,2233
+LA-WCM-000169,2025-01-04,Willow Creek Meadows,build,390347.0,1460
+LA-WCM-000172,2025-01-11,Willow Creek Meadows,spec,446052.0,1334
+LA-WCM-000138,2024-11-13,Willow Creek Meadows,build,382472.0,1993
+LA-SP-000307,2025-12-02,Sunset Pines,spec,839080.0,2551
+LA-WCM-000066,2024-06-13,Willow Creek Meadows,spec,406967.0,1542
+LA-WCM-000052,2024-05-19,Willow Creek Meadows,spec,372951.0,1607
+LA-WCM-000123,2024-10-27,Willow Creek Meadows,model,351050.0,1751
+LA-MH-000263,2025/09/29,Maplewood Heights,spec,488334.0,2508
+LA-WCM-000264,2025-09-25,Willow Creek Meadows,build,417634.0,1262
+LA-WCM-000112,2024-09-18,Willow Creek Meadows,build,421564.0,1555
+LA-MH-000025,2024-04-09,Maplewood-Heights,spec,450668.0,2429
+LA-WCM-000193,2025-03-16,Willow Creek Meadows,spec,447490.0,1585
+LA-OV-000176,2025-01-18,Oakridge Villas,spec,720007.0,1987
+LA-MH-000046,2024-05-14,Maplewood Heights,build,494414.0,2385
+LA-MH-000191,2025-03-25,Maplewood Heights,build,560968.0,2457
+LA-MH-000103,2024-09-22,Maplewood Heights,model,474653.0,2835
+LA-WCM-000111,2024-09-24,Willow Creek Meadows,spec,401530.0,1843
+LA-WCM-000108,2024-09-02,Willow Creek Meadows,spec,354344.0,1771
+LA-WCM-000048,2024-05-31,Willow Creek Meadows,build,412523.0,1751
+LA-WCM-000290,2025-11-02,Willow Creek Meadows,spec,365613.0,1610
+LA-MH-000188,2025-03-27,Maplewood Heights,build,440629.0,2143
+LA-WCM-000289,2025-11-03,Willow Creek Meadows,build,408899.0,1564
+LA-WCM-000065,2024-06-26,Willow Creek Meadows,build,511546.0,1665
+LA-MH-000157,2025-01-25,Maplewood Heights,spec,536200.0,2161
+LA-WCM-000140,2024-11-23,Willow Creek Meadows,spec,334868.0,1829
+LA-WCM-000170,2025-01-23,Willow Creek Meadows,build,411415.0,1425
+LA-SP-000115,2024-09-24,Sunset Pines,build,838311.0,2845
+LA-WCM-000080,2024-07-15,Willow Creek Meadows,spec,421484.0,1894
+LA-WCM-000173,2025-01-12,Willow Creek Meadows,build,441482.0,1529
+LA-OV-000306,2025-12-12,Oakridge Villas,spec,779798.0,2137
+LA-WCM-000194,2025-03-31,Willow Creek Meadows,build,384709.0,1810
+LA-WCM-000074,2024-07-20,Willow Creek Meadows,build,423868.0,1594
+LA-MH-000284,2025-11-04,Maplewood Heights,build,530599.0,2344
+LA-WCM-000213,06-05-2025,Willow Creek Meadows,model,401515.0,1835
+LA-MH-000096,2024-09-09,Maplewood Heights,spec,495112.0,2186
+LA-OV-000177,2025/01/13,Oakridge Villas,spec,740130.0,2140
+LA-MH-000024,2024-04-13,Maplewood Heights,build,500230.0,2141
+LA-WCM-000301,2025-12-24,Willow Creek Meadows,spec,410594.0,1554
+LA-WCM-000049,2024-05-01,Willow Creek Meadows,spec,415742.0,1970
+LA-MH-000006,2024-02-19,Maplewood Heights,spec,498900.0,2289
+LA-WCM-000265,2025-09-17,Willow Creek Meadows,build,412693.0,1884
+LA-MH-000040,2024-05-16,Maplewood Heights,build,543352.0,2303
+LA-MH-000164,2025-01-22,Maplewood Heights,spec,556074.0,1682
+LA-MH-000004,2024-02-12,Maplewood Heights,spec,390240.0,2351
+LA-MH-000295,2025-12-18,Maplewood Heights,build,519600.0,2423
+LA-WCM-000086,2024-08-01,Willow Creek Meadows,spec,402438.0,1827
+LA-SP-000132,2024-10-18,Sunset Pines,spec,889865.0,3496
+LA-WCM-000225,2025-06-07,Willow Creek Meadows,spec,384279.0,1853
+LA-OV-000033,2024-04-04,Oakridge Villas,spec,599207.0,2521
+LA-MH-000094,2024-09-15,Maplewood Heights,spec,422909.0,2538
+LA-MH-000220,2025-06-02,Maplewood Heights,build,567281.0,2253
+LA-MH-000271,2025-10-23,Maplewood Heights,spec,527000.0,1997
+LA-WCM-000194,2025-03-31,Willow Creek Meadows,build,383709.0,1810
+LA-WCM-000106,2024-09-29,Willow Creek Meadows,spec,399485.0,1793
+LA-MH-000099,2024-09-14,Maplewood Heights,spec,461817.0,1966
+LA-WCM-000166,2025-01-23,Willow Creek Meadows,build,381642.0,1738
+LA-SP-000231,2025-06-26,Sunset Pines,build,768011.0,2833
+LA-MH-000059,2024-06-21,Maplewood Heights,build,596059.0,2257
+LA-WCM-000183,2025-02-08,Willow Creek Meadows,spec,408067.0,1728
+LA-SP-000205,2025-04-25,Sunset Pines,build,793286.0,2835
+LA-OV-000020,2024-03-05,Oakridge Villas,spec,796063.0,2345
+LA-MH-000219,2025-06-13,Maplewood Heights,build,501109.0,2222
+LA-OV-000291,2025-11-10,Oakridge Villas,build,662220.0,2231
+LA-MH-000299,2025-12-11,Maplewood Heights,spec,565677.0,1779
+LA-MH-000180,2025-02-02,Maplewood-Heights,build,455331.0,2328
+LA-WCM-000239,2025/07/08,Willow Creek Meadows,build,378279.0,1729
+LA-MH-000014,2024-03-03,Maplewood Heights,build,531430.0,2243
+LA-WCM-000280,2025-10-13,Willow Creek Meadows,build,404217.0,1465
+LA-MH-000201,2025-04-05,Maplewood Heights,build,499601.0,2166
+LA-WCM-000104,2024-09-02,Willow Creek Meadows,spec,452582.0,1663
+LA-SP-000292,2025-11-24,Sunset Pines,model,862884.0,2981
+LA-MH-000146,2024-12-15,Maplewood Heights,spec,559870.0,2700
+LA-WCM-000224,2025-06-24,Willow Creek Meadows,spec,412849.0,1555
+LA-OV-000018,2024-03-15,Oakridge Villas,spec,610253.0,2416
+LA-OV-000241,2025-07-28,Oakridge Villas,spec,766504.0,2527
+LA-MH-000083,2024-08-29,Maplewood Heights,spec,454130.0,2408
+LA-MH-000061,2024-06-16,Maplewood Heights,spec,484728.0,1996
+LA-MH-000293,2025-12-10,Maplewood Heights,spec,533289.0,2137
+LA-OV-000254,2025-08-19,Oakridge Villas,build,809455.0,2362
+LA-MH-000038,2024-05-16,Maplewood Heights,spec,507867.0,1896
+LA-MH-000069,2024-07-19,Maplewood Heights,build,555360.0,1877
+LA-WCM-000007,2024-02-25,Willow Creek Meadows,model,378991.0,1821
+LA-OV-000186,2025-02-20,Oakridge Villas,spec,866405.0,2471
+LA-MH-000297,2025-12-18,Maplewood Heights,spec,522626.0,2110
+LA-SP-000204,2025/04/28,Sunset Pines,spec,903938.0,2834
+LA-WCM-000248,2025-08-24,Willow Creek Meadows,spec,-100000.0,1547
+LA-MH-000134,2024-11-30,Maplewood Heights,spec,520818.0,2361
+LA-WCM-000107,2024-09-28,Willow Creek Meadows,spec,404481.0,1563
+LA-MH-000082,2024-08-13,Maplewood Heights,build,467670.0,2147
+LA-WCM-000275,2025-10-26,Willow Creek Meadows,spec,411985.0,1450
+LA-WCM-000167,2025-01-01,Willow Creek Meadows,build,430169.0,1762
+LA-MH-000149,2024-12-26,Maplewood Heights,build,512599.0,1919
+LA-WCM-000028,2024/04/02,Willow Creek Meadows,build,393267.0,1704
+LA-MH-000268,2025-10-21,Maplewood Heights,spec,430499.0,2326
+LA-OV-000131,2024-10-06,Oakridge Villas,build,695705.0,2137
+LA-WCM-000109,2024-09-19,Willow Creek Meadows,build,481969.0,1452
+LA-MH-000118,2024-10-03,Maplewood Heights,spec,513215.0,2078
+LA-MH-000285,2025-11-18,Maplewood Heights,build,559344.0,2222
+LA-MH-000046,2024-05-14,Maplewood Heights,build,494914.0,2385
+LA-MH-000116,2024-10-13,Maplewood Heights,spec,539008.0,2318
+LA-SP-000255,2025-08-10,Sunset Pines,model,760031.0,2659
+LA-MH-000260,2025-09-28,Maplewood Heights,spec,441739.0,2490
+LA-MH-000071,2024-07-21,Maplewood Heights,spec,520189.0,2180
+LA-WCM-000279,2025-10-06,Willow Creek Meadows,build,387253.0,1786
+LA-MH-000237,2025-07-08,Maplewood Heights,spec,487540.0,2194
+LA-MH-000162,2025-01-30,Maplewood Heights,spec,615647.0,1923
+LA-MH-000027,2024-04-09,Maplewood Heights,spec,499303.0,2193
+LA-MH-000151,2024-12-11,Maplewood Heights,build,580197.0,2348
+LA-OV-000129,2024-10-26,Oakridge Villas,spec,718184.0,1678
+LA-WCM-000238,2025-07-11,Willow Creek Meadows,build,413025.0,1736
+LA-SP-000230,2025-06-06,Sunset Pines,build,716895.0,2858
+LA-SP-000197,2025-03-29,Sunset Pines,build,806538.0,3428
+LA-WCM-000128,2024-10-24,Willow Creek Meadows,build,419822.0,1800
+LA-WCM-000139,2024-11-08,Willow Creek Meadows,spec,334522.0,1587
+LA-WCM-000252,2025-08-07,Willow Creek Meadows,spec,413973.0,1766
+LA-MH-000042,2024-05-22,Maplewood Heights,spec,539790.0,2140
+LA-MH-000282,2025-11-02,Maplewood Heights,spec,544179.0,2119
+LA-MH-000081,2024-08-19,Maplewood Heights,build,513045.0,2153
+LA-SP-000218,2025-05-31,Sunset Pines,build,783335.0,2792
+LA-WCM-000139,2024-11-08,Willow Creek Meadows,spec,334522.0,1587
+LA-WCM-000184,2025-02-08,Willow Creek Meadows,build,472846.0,1595
+LA-WCM-000090,2024-08-23,Willow Creek Meadows,spec,396117.0,1826
+LA-SP-000217,2025-05-07,Sunset Pines,build,798127.0,3139
+LA-MH-000202,2025-04-24,Maplewood Heights,spec,454814.0,2008
+LA-WCM-000113,2024-09-18,Willow Creek Meadows,spec,396254.0,1464
+LA-MH-000245,2025-08-18,Maplewood Heights,build,506581.0,2331
+LA-OV-000130,2024-10-17,Oakridge Villas,build,764187.0,2729
+LA-OV-000056,2024-05-06,Oakridge Villas,spec,855287.0,3053
+LA-WCM-000050,2024-05-10,Willow Creek Meadows,build,410656.0,1696
+LA-MH-000222,2025-06-02,Maplewood Heights,spec,527355.0,2247
+LA-OV-000156,2024-12-09,Oakridge Villas,spec,730896.0,2896
+LA-MH-000042,2024-05-22,Maplewood Heights,spec,539540.0,2140
+LA-WCM-000168,2025-01-24,Willow Creek Meadows,build,408213.0,1695
+LA-WCM-000016,2024-03-24,Willow Creek Meadows,build,344905.0,1765
+LA-MH-000072,2024-07-04,Maplewood Heights,spec,533628.0,2353
+LA-MH-000150,2024-12-30,Maplewood Heights,spec,539053.0,1966
+LA-MH-000001,2024-02-24,Maplewood Heights,spec,517666.0,1968
+LA-OV-000057,2024-05-23,Oakridge Villas,spec,614986.0,1903
+LA-WCM-000185,2025-02-22,Willow Creek Meadows,spec,338582.0,1628
+LA-MH-000199,2025-04-21,Maplewood Heights,spec,427757.0,2342
+LA-MH-000181,2025/02/13,Maplewood Heights,build,563175.0,2076
+LA-WCM-000030,2024-04-23,Willow Creek Meadows,build,372863.0,1789
+LA-WCM-000127,2024-10-11,Willow Creek Meadows,build,379813.0,1786
+LA-WCM-000091,2024-08-28,Willow Creek Meadows,spec,416195.0,1463
+LA-SP-000178,2025/01/29,Sunset Pines,spec,726668.0,3138
+LA-MH-000134,2024-11-30,Maplewood Heights,spec,520318.0,2361
+LA-OV-000215,2025-05-19,Oakridge Villas,build,658540.0,2358
+LA-WCM-000168,2025-01-24,Willow Creek Meadows,build,408213.0,1695
+LA-WCM-000077,2024-07-21,Willow Creek Meadows,spec,439324.0,2036
+LA-MH-000147,2024-12-26,Maplewood Heights,spec,452373.0,2072
+LA-WCM-000076,2024-07-31,Willow Creek Meadows,model,466931.0,1842
+LA-MH-000148,2024-12-10,Maplewood Heights,spec,481688.0,1837
+LA-MH-000100,2024-09-04,Maplewood Heights,spec,547720.0,2585
+LA-MH-000261,2025-09-08,Maplewood Heights,build,436717.0,2062
+LA-WCM-000079,2024-07-13,Willow Creek Meadows,build,463478.0,1723
+LA-MH-000189,2025-03-30,Maplewood Heights,model,531123.0,2522
+LA-MH-000159,2025-01-18,Maplewood Heights,build,487900.0,1923
+LA-MH-000119,2024-10-28,Maplewood Heights,spec,452243.0,2036
+LA-MH-000300,2025-12-30,Maplewood Heights,spec,530014.0,1813
+LA-WCM-000171,2025-01-28,Willow Creek Meadows,build,407954.0,1785
+LA-MH-000235,2025-07-20,Maplewood Heights,spec,498193.0,1842
+LA-WCM-000154,2024-12-14,Willow Creek Meadows,spec,385914.0,1573
+LA-MH-000098,2024-09-03,Maplewood Heights,build,479747.0,2356
+LA-WCM-000211,2025-05-05,Willow Creek Meadows,build,366203.0,1496
+LA-WCM-000153,2024-12-14,Willow Creek Meadows,build,396842.0,1791
+LA-OV-000229,2025-06-03,Oakridge Villas,model,685543.0,2156
+LA-OV-000195,2025-03-31,Oakridge Villas,spec,644375.0,3323
+LA-MH-000287,2025-11-25,Maplewood Heights,build,445221.0,2079
+LA-WCM-000249,2025-08-23,Willow Creek Meadows,spec,354107.0,1866
+LA-OV-000092,2024-08-28,Oakridge Villas,spec,722214.0,3063
+LA-WCM-000303,2025-12-05,Willow Creek Meadows,build,379641.0,1467
+LA-WCM-000273,2025-10-08,Willow Creek Meadows,build,406323.0,1785
+LA-MH-000012,2024-03-21,Maplewood Heights,build,504339.0,25000
+LA-WCM-000227,2025-06-03,Willow Creek Meadows,spec,415401.0,1560
+LA-MH-000005,2024-02-28,Maplewood Heights,model,488703.0,2159
+LA-WCM-000017,2024-03-03,Willow Creek Meadows,spec,412657.0,1534
+LA-MH-000198,2025-04-13,Maplewood Heights,build,476722.0,2552
+LA-MH-000179,2025-02-21,Maplewood Heights,spec,541012.0,1971
+LA-MH-000223,2025-06-29,Maplewood Heights,build,523339.0,2044
+LA-WCM-000142,2024-11-19,Willow Creek Meadows,build,334643.0,1512
+LA-SP-000023,2024-03-30,Sunset Pines,build,765168.0,2910
+LA-WCM-000248,2025-08-19,Willow Creek Meadows,spec,418299.0,1547
+LA-WCM-000032,2024-04-11,Willow Creek Meadows,build,384502.0,1718
+LA-MH-000122,2024-10-15,Maplewood Heights,build,518070.0,2612
+LA-OV-000129,2024-10-26,Oakridge Villas,spec,718434.0,1678
+LA-MH-000133,2024-11-09,Maplewood Heights,build,388776.0,2001
+LA-MH-000043,2024-05-27,Maplewood Heights,spec,558516.0,1864
+LA-WCM-000302,2025-12-10,Willow Creek Meadows,build,373798.0,1806
+LA-MH-000281,2025-11-26,Maplewood Heights,build,520299.0,1938
+LA-MH-000026,2024/04/24,Maplewood Heights,build,509672.0,1694
+LA-MH-000102,2024-09-22,Maplewood Heights,build,553068.0,2217
+LA-MH-000063,2024-06-26,Maplewood Heights,build,475284.0,2474
+LA-WCM-000073,2024-07-25,Willow Creek Meadows,spec,422900.0,1244
+LA-WCM-000274,2025-10-31,Willow Creek Meadows,build,457170.0,1444
+LA-WCM-000075,2024-07-17,Willow Creek Meadows,spec,413721.0,1628
+LA-MH-000041,2024-05-17,Maplewood Heights,spec,528541.0,2965
+LA-WCM-000250,2025-08-24,Willow Creek Meadows,model,360526.0,1752
+LA-WCM-000105,2024-9-28,Willow Creek Meadows,spec,466707.0,1691
+LA-MH-000221,2025-06-06,Maplewood Heights,spec,497911.0,2118
+LA-SP-000256,2025-08-03,Sunset Pines,build,861956.0,3194
+LA-MH-000236,2025-07-31,Maplewood-Heights,build,540083.0,1771
+LA-WCM-000124,2024-10-22,Willow Creek Meadows,spec,392782.0,1240
+LA-WCM-000210,2025-05-24,Willow Creek Meadows,spec,419022.0,1845
+LA-SP-000022,2024-03-21,Sunset Pines,build,776161.0,3128
+LA-OV-000054,2024-05-15,Oakridge Villas,spec,704178.0,2177
+LA-MH-000120,2024-10-26,Maplewood Heights,build,-100000.0,1902
+LA-MH-000298,2025-12-01,Maplewood Heights,spec,555106.0,2606
+LA-OV-000011,10-02-2024,Oakridge Villas,build,748000.0,2551
+LA-OV-000035,2024-04-18,Oakridge Villas,build,775998.0,50
+LA-MH-000165,2025-01-31,Maplewood Heights,spec,474453.0,50
+LA-MH-000234,2025-07-21,Maplewood Heights,build,573715.0,2575
+LA-WCM-000009,2024-02-12,Willow Creek Meadows,spec,428789.0,1430
+LA-SP-000067,2024-06-18,Sunset Pines,build,810214.0,2932
+LA-WCM-000141,2024-11-15,Willow Creek Meadows,spec,431234.0,1667
+LA-MH-000064,2024-06-30,Maplewood Heights,spec,573459.0,1842
+LA-MH-000002,2024-02-21,Maplewood Heights,model,478874.0,2336
+LA-MH-000286,2025-11-11,Maplewood Heights,spec,534152.0,2270
+LA-MH-000093,2024-09-23,Maplewood Heights,spec,495141.0,2582
+LA-OV-000019,2024-03-07,Oakridge Villas,spec,816628.0,2674
+LA-WCM-000051,2024-05-13,Willow Creek Meadows,spec,380542.0,1627
+LA-MH-000117,2024-10-11,Maplewood Heights,build,494244.0,1961
+LA-SP-000145,2024-11-04,Sunset Pines,build,821554.0,3083
+LA-OV-000243,2025-07-02,Oakridge Villas,model,741088.0,2206
+LA-WCM-000087,2024-08-11,Willow Creek Meadows,build,429525.0,1458
+LA-WCM-000304,2025-12-27,Willow Creek Meadows,spec,364215.0,2024
+LA-MH-000190,2025-03-17,Maplewood Heights,build,537526.0,2315
+LA-WCM-000073,2024-07-25,Willow Creek Meadows,spec,422150.0,1244
+LA-WCM-000288,2025-11-21,Willow Creek Meadows,spec,9999999.0,1539
+LA-MH-000235,2025-07-22,Maplewood Heights,spec,498193.0,1842
+LA-WCM-000214,2025-05-19,Willow Creek Meadows,build,446336.0,1446
+LA-WCM-000016,2024-03-24,Willow Creek Meadows,build,345655.0,1765
+LA-MH-000015,2024-03-26,Maplewood Heights,spec,514907.0,2444
+LA-MH-000258,2025-09-29,Maplewood Heights,spec,399451.0,2259
+LA-SP-000058,2024-05-26,Sunset Pines,model,822724.0,3216
+LA-MH-000101,2024-09-28,Maplewood Heights,spec,499926.0,2093
+LA-MH-000246,2025-08-20,Maplewood Heights,spec,505154.0,2438
+LA-WCM-000110,2024-09-11,Willow Creek Meadows,spec,361456.0,1738
+LA-WCM-000228,2025-06-29,Willow Creek Meadows,spec,416230.0,1754
+LA-SP-000068,2024-06-11,Sunset Pines,build,819770.0,2973
+LA-MH-000200,2025-04-25,Maplewood Heights,build,424318.0,1760
+LA-SP-000196,2025-03-23,Sunset Pines,spec,818566.0,2518
+LA-MH-000221,2025-06-06,Maplewood Heights,spec,498661.0,2118
+LA-MH-000152,2024-12-24,Maplewood Heights,spec,554224.0,2368
+LA-MH-000121,2024-10-25,Maplewood Heights,build,499641.0,2570
+LA-WCM-000240,2025-07-12,Willow Creek Meadows,model,399874.0,1441
+LA-MH-000085,2024-08-28,Maplewood Heights,build,538338.0,2392
+LA-MH-000097,2024-09-06,Maplewood Heights,build,573749.0,2256
+LA-MH-000060,2024-06-05,Maplewood Heights,build,431628.0,2079
+LA-WCM-000174,2025-01-09,Willow Creek Meadows,spec,407386.0,1633
+LA-OV-000242,2025-07-30,Oakridge Villas,spec,688364.0,2280
+LA-WCM-000277,2025-10-09,Willow Creek Meadows,spec,378848.0,1591
