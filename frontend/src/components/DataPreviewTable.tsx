@@ -1,6 +1,70 @@
 import { useEffect, useMemo, useState } from "react";
 import type { OutputPreview } from "../types/pipelineRun";
 
+const DATE_SORT_COLUMN_PRIORITY = [
+  "SALE_CONTRACT_DATE",
+  "CONTRACT_DATE",
+  "SALE_DATE",
+  "LEAD_DATE",
+  "SESSION_DATE",
+  "VISIT_DATE",
+  "year_month",
+  "YEAR_MONTH",
+  "month",
+  "MONTH",
+  "DATE",
+  "date",
+  "TIMESTAMP",
+  "CREATED_AT",
+  "UPDATED_AT",
+];
+
+function parseSortableTime(value: unknown): number | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (value > 1e12) return value;
+    if (value > 1e9) return value * 1000;
+  }
+  const s = String(value).trim();
+  if (!s) return null;
+  let t = Date.parse(s);
+  if (!Number.isNaN(t)) return t;
+  if (/^\d{4}-\d{2}$/.test(s)) {
+    t = Date.parse(`${s}-01`);
+    if (!Number.isNaN(t)) return t;
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    t = Date.parse(s);
+    if (!Number.isNaN(t)) return t;
+  }
+  return null;
+}
+
+function pickPrimaryDateColumn(columns: string[]): string | null {
+  const byUpper = new Map(columns.map((c) => [c.toUpperCase(), c] as const));
+  for (const key of DATE_SORT_COLUMN_PRIORITY) {
+    const found = byUpper.get(key.toUpperCase());
+    if (found) return found;
+  }
+  for (const c of columns) {
+    const u = c.toUpperCase();
+    if (/_DATE$/.test(u) || u.endsWith("_AT") || u.includes("TIMESTAMP")) return c;
+    if (u === "DATE" || u === "MONTH" || u === "YEAR_MONTH") return c;
+  }
+  return null;
+}
+
+function sortRowsByPrimaryDateDesc(rows: Record<string, unknown>[], dateCol: string): Record<string, unknown>[] {
+  return [...rows].sort((a, b) => {
+    const ta = parseSortableTime(a[dateCol]);
+    const tb = parseSortableTime(b[dateCol]);
+    if (ta != null && tb != null && ta !== tb) return tb - ta;
+    if (ta == null && tb == null) return 0;
+    if (ta == null) return 1;
+    return -1;
+  });
+}
+
 function cellStr(v: unknown): string {
   if (v === null || v === undefined) return "—";
   if (typeof v === "number" && Number.isFinite(v)) {
@@ -23,21 +87,27 @@ export function DataPreviewTable({
   const { columns, rows, truncated, total_rows, preview_rows } = preview;
   const [page, setPage] = useState(1);
 
+  const dateSortColumn = useMemo(() => pickPrimaryDateColumn(columns), [columns]);
+  const displayRows = useMemo(() => {
+    if (!dateSortColumn) return rows;
+    return sortRowsByPrimaryDateDesc(rows, dateSortColumn);
+  }, [rows, dateSortColumn]);
+
   useEffect(() => {
     setPage(1);
   }, [rows.length, total_rows, pageSize]);
 
-  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(displayRows.length / pageSize));
   const safePage = Math.min(page, totalPages);
   const pagedRows = useMemo(() => {
     const start = (safePage - 1) * pageSize;
-    return rows.slice(start, start + pageSize);
-  }, [pageSize, rows, safePage]);
+    return displayRows.slice(start, start + pageSize);
+  }, [pageSize, displayRows, safePage]);
 
   if (!columns.length) {
     return (
       <p className="rounded-xl border border-white/10 bg-canvas-elevated/50 px-4 py-3 text-sm text-ink-faint">
-        {"No rows in this step's output (empty table)."}
+        {"No rows in this step's output."}
       </p>
     );
   }
@@ -49,6 +119,7 @@ export function DataPreviewTable({
         <span className="font-mono text-[0.7rem] text-ink-faint">
           {total_rows} row{total_rows === 1 ? "" : "s"} total
           {truncated ? ` · loaded ${preview_rows}` : ""}
+          {dateSortColumn ? ` · sort ${dateSortColumn} ↓` : ""}
         </span>
       </div>
       <div className="data-preview-scroll max-h-[32rem] overflow-auto">
@@ -81,13 +152,13 @@ export function DataPreviewTable({
           </tbody>
         </table>
       </div>
-      {rows.length > pageSize && (
+      {displayRows.length > pageSize && (
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] bg-canvas-subtle/30 px-4 py-3">
           <span className="text-[0.72rem] text-ink-faint">
             Page {safePage} of {totalPages}
             {" · "}
             rows {(safePage - 1) * pageSize + 1}-
-            {Math.min(safePage * pageSize, rows.length)}
+            {Math.min(safePage * pageSize, displayRows.length)}
           </span>
           <div className="flex items-center gap-2">
             <button

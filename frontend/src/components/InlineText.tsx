@@ -1,6 +1,3 @@
-/**
- * Plain text with `code` and **bold** (minimal Markdown-like).
- */
 function CodeSpans({ text }: { text: string }) {
   const parts = text.split(/(`[^`]+`)/g);
   return (

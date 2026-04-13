@@ -1,7 +1,4 @@
-/**
- * Pipeline tour content — adapted from docs/*.md (MkDocs).
- * Diagrams use Mermaid source strings identical to the markdown files.
- */
+// Tour copy + Mermaid sources (aligned with docs/).
 
 export type TourStep = {
   id: string;
@@ -21,7 +18,6 @@ export type TourStep = {
   nextId?: string;
 };
 
-/** Inline snippets as plain strings; pages render with <Code /> */
 export const tourSteps: TourStep[] = [
   {
     id: "pipeline-overview",
@@ -531,20 +527,19 @@ export const tourById = Object.fromEntries(tourSteps.map((s) => [s.id, s]));
 
 export const homeContent = {
   title: "Real Estate Heterogeneous Data Analytics",
-  lead:
-    "Documentation experience aligned with PipelineService.execute() — seven chapters, interactive diagrams, and typography tuned for long reads.",
+  lead: "Seven-step pipeline tour, Mermaid diagrams, and the same ARCHITECTURE.md files as in the repo.",
   bullets: [
     {
       title: "Pipeline tour",
-      text: "End-to-end flow in seven chapters — same narrative as the MkDocs site.",
+      text: "Follows PipelineService.execute(): seven sections, mirrors the MkDocs order.",
     },
     {
       title: "Architecture",
-      text: "ARCHITECTURE.md files live next to the code; consult the repository or MkDocs for the full tree.",
+      text: "Per-package ARCHITECTURE.md under src/; also included in the static docs build.",
     },
     {
       title: "Diagrams",
-      text: "Mermaid renders in-browser with a dark theme to match this UI.",
+      text: "Mermaid in the tour uses the app dark theme.",
     },
   ],
 };

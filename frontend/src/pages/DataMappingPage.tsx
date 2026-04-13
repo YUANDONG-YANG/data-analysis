@@ -11,30 +11,26 @@ type CommunityMapping = {
   confidence?: "high" | "medium" | "low";
 };
 
-// Smart default mapping rules
 function suggestCanonicalName(variant: string): { canonical: string; confidence: "high" | "medium" | "low" } {
-  // Remove common suffixes and normalize
   const normalized = variant
-    .replace(/\s*-\s*Phase\s+\d+/gi, "") // Remove "- Phase 2"
-    .replace(/\s+TH$/i, " Townhomes") // "TH" -> "Townhomes"
-    .replace(/\s+Est\.?$/i, " Estates") // "Est." -> "Estates"
-    .replace(/[-_]/g, " ") // Replace dashes/underscores with spaces
-    .replace(/\s+/g, " ") // Normalize whitespace
+    .replace(/\s*-\s*Phase\s+\d+/gi, "")
+    .replace(/\s+TH$/i, " Townhomes")
+    .replace(/\s+Est\.?$/i, " Estates")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 
-  // Title case
   const titleCased = normalized
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
 
-  // Determine confidence based on transformations
   let confidence: "high" | "medium" | "low" = "high";
   if (variant !== normalized) {
     confidence = variant.includes("Phase") || variant.includes("TH") || variant.includes("Est") ? "high" : "medium";
   }
   if (variant === titleCased) {
-    confidence = "low"; // No changes needed
+    confidence = "low";
   }
 
   return { canonical: titleCased, confidence };
@@ -47,6 +43,27 @@ type ConfigData = {
   };
 };
 
+function previewMatchesSearch(row: Record<string, unknown>, rawQuery: string): boolean {
+  const q = rawQuery.trim().toLowerCase();
+  if (!q) return true;
+
+  const parts: string[] = [
+    String(row.community_name_original ?? ""),
+    String(row.community_name_mapped ?? ""),
+    row.is_mapped ? "mapped" : "unchanged",
+  ];
+  for (const [key, val] of Object.entries(row)) {
+    if (key === "community_name_original" || key === "community_name_mapped" || key === "is_mapped") {
+      continue;
+    }
+    if (val != null && typeof val !== "object") {
+      parts.push(String(val));
+    }
+  }
+  const haystack = parts.join(" ").toLowerCase();
+  return haystack.includes(q);
+}
+
 export function DataMappingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,11 +72,11 @@ export function DataMappingPage() {
   const [userMappings, setUserMappings] = useState<Record<string, string>>({});
   const [previewData, setPreviewData] = useState<any[]>([]);
   const [previewPage, setPreviewPage] = useState(1);
+  const [previewSearchQuery, setPreviewSearchQuery] = useState("");
   const [configPage, setConfigPage] = useState(1);
   const previewPageSize = 20;
   const configPageSize = 10;
 
-  // Load config and detect variants from data
   useEffect(() => {
     async function loadData() {
       setLoading(true);
@@ -178,13 +195,23 @@ export function DataMappingPage() {
     });
   }, [previewData, userMappings]);
 
-  // Paginated preview
-  const totalPreviewPages = Math.max(1, Math.ceil(previewWithMappings.length / previewPageSize));
+  const previewFiltered = useMemo(() => {
+    return previewWithMappings.filter((row) =>
+      previewMatchesSearch(row as Record<string, unknown>, previewSearchQuery),
+    );
+  }, [previewWithMappings, previewSearchQuery]);
+
+  useEffect(() => {
+    setPreviewPage(1);
+  }, [previewSearchQuery]);
+
+  // Paginated preview (after search filter)
+  const totalPreviewPages = Math.max(1, Math.ceil(previewFiltered.length / previewPageSize));
   const safePreviewPage = Math.min(previewPage, totalPreviewPages);
   const paginatedPreview = useMemo(() => {
     const start = (safePreviewPage - 1) * previewPageSize;
-    return previewWithMappings.slice(start, start + previewPageSize);
-  }, [previewWithMappings, safePreviewPage, previewPageSize]);
+    return previewFiltered.slice(start, start + previewPageSize);
+  }, [previewFiltered, safePreviewPage, previewPageSize]);
 
   // Paginated config list
   const totalConfigPages = Math.max(1, Math.ceil(mappingList.length / configPageSize));
@@ -356,7 +383,9 @@ export function DataMappingPage() {
           <ol className="space-y-2 text-sm text-ink-muted">
             <li className="flex items-start gap-2">
               <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent/20 text-xs font-semibold text-accent">1</span>
-              <span>Review <strong className="text-ink">Smart Grouping</strong> section - apply bulk mappings for similar variants</span>
+              <span>
+                Use <strong className="text-ink">Bulk mapping</strong> to align similar community names
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent/20 text-xs font-semibold text-accent">2</span>
@@ -378,10 +407,9 @@ export function DataMappingPage() {
         </div>
       </header>
 
-      {/* Smart Grouping Section */}
       {variantGroups.length > 0 && (
         <section className="mt-8 rounded-2xl border border-white/[0.06] bg-canvas-elevated/50 p-6 shadow-card">
-          <h2 className="mb-4 text-xl font-semibold text-ink">Smart Grouping - Bulk Mapping</h2>
+          <h2 className="mb-4 text-xl font-semibold text-ink">Bulk mapping</h2>
           <p className="mb-4 text-sm text-ink-muted">
             System detected variants that can be mapped to the same canonical name. Review and apply in bulk.
           </p>
@@ -498,7 +526,7 @@ export function DataMappingPage() {
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-amber-100">Smart Suggestions Available</p>
+                  <p className="text-sm font-medium text-amber-100">Suggestions available</p>
                   <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
                     {mappingList.filter((m) => m.source === "auto-suggested").length} unmapped variant(s) detected. 
                     The system has suggested canonical names based on common patterns. Review and apply or modify as needed.
@@ -650,67 +678,125 @@ export function DataMappingPage() {
 
         {/* Preview Panel */}
         <section className="rounded-2xl border border-white/[0.06] bg-canvas-elevated/50 p-6 shadow-card">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-ink">
-              Preview ({previewWithMappings.length} Records)
-            </h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-ink">Preview</h2>
+              <p className="mt-1 text-xs text-ink-faint">
+                {previewWithMappings.length} record{previewWithMappings.length === 1 ? "" : "s"} loaded
+                {previewSearchQuery.trim() ? (
+                  <>
+                    {" "}
+                    · <span className="text-accent-glow">{previewFiltered.length}</span> shown
+                  </>
+                ) : null}
+              </p>
+            </div>
             <span className="text-xs text-ink-faint">
               Page {safePreviewPage} of {totalPreviewPages}
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/[0.06]">
-                  <th className="pb-2 pr-3 text-left text-xs font-medium text-ink-faint">
-                    Original
-                  </th>
-                  <th className="pb-2 pr-3 text-left text-xs font-medium text-ink-faint">
-                    Mapped
-                  </th>
-                  <th className="pb-2 text-left text-xs font-medium text-ink-faint">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedPreview.map((row, idx) => (
-                  <tr key={idx} className="border-b border-white/[0.03]">
-                    <td className="py-2 pr-3 font-mono text-xs text-ink-muted">
-                      {row.community_name_original}
-                    </td>
-                    <td className="py-2 pr-3 font-mono text-xs text-ink">
-                      {row.community_name_mapped}
-                    </td>
-                    <td className="py-2">
-                      {row.is_mapped ? (
-                        <span className="inline-flex items-center gap-1 text-xs text-emerald-200">
-                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          Mapped
-                        </span>
-                      ) : (
-                        <span className="text-xs text-ink-faint">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {previewWithMappings.length > 0 ? (
+            <div className="mb-4">
+              <label htmlFor="preview-search" className="sr-only">
+                Search preview rows
+              </label>
+              <div className="relative">
+                <span
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint"
+                  aria-hidden
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </span>
+                <input
+                  id="preview-search"
+                  type="search"
+                  value={previewSearchQuery}
+                  onChange={(e) => setPreviewSearchQuery(e.target.value)}
+                  placeholder="Search preview rows…"
+                  autoComplete="off"
+                  className="w-full rounded-xl border border-white/[0.08] bg-canvas/80 py-2.5 pl-10 pr-10 text-sm text-ink placeholder:text-ink-faint/80 shadow-inner transition focus:border-accent/40 focus:outline-none focus:ring-1 focus:ring-accent/30"
+                />
+                {previewSearchQuery ? (
+                  <button
+                    type="button"
+                    onClick={() => setPreviewSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs text-ink-faint transition hover:bg-white/[0.06] hover:text-ink"
+                    aria-label="Clear search"
+                  >
+                    Clear
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
 
           {previewWithMappings.length === 0 ? (
             <p className="py-8 text-center text-sm text-ink-faint">No preview data available</p>
+          ) : previewFiltered.length === 0 ? (
+            <p className="py-8 text-center text-sm text-ink-faint">
+              No rows match “{previewSearchQuery.trim()}”. Try a shorter phrase or clear the search.
+            </p>
           ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    <th className="pb-2 pr-3 text-left text-xs font-medium text-ink-faint">
+                      Original
+                    </th>
+                    <th className="pb-2 pr-3 text-left text-xs font-medium text-ink-faint">
+                      Mapped
+                    </th>
+                    <th className="pb-2 text-left text-xs font-medium text-ink-faint">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedPreview.map((row, idx) => (
+                    <tr key={idx} className="border-b border-white/[0.03]">
+                      <td className="py-2 pr-3 font-mono text-xs text-ink-muted">
+                        {row.community_name_original}
+                      </td>
+                      <td className="py-2 pr-3 font-mono text-xs text-ink">
+                        {row.community_name_mapped}
+                      </td>
+                      <td className="py-2">
+                        {row.is_mapped ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-emerald-200">
+                            <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Mapped
+                          </span>
+                        ) : (
+                          <span className="text-xs text-ink-faint">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {previewWithMappings.length === 0 ? null : previewFiltered.length === 0 ? null : (
             <div className="mt-4 flex items-center justify-between gap-4">
               <span className="text-xs text-ink-faint">
                 Showing {(safePreviewPage - 1) * previewPageSize + 1}-
-                {Math.min(safePreviewPage * previewPageSize, previewWithMappings.length)} of{" "}
-                {previewWithMappings.length}
+                {Math.min(safePreviewPage * previewPageSize, previewFiltered.length)} of{" "}
+                {previewFiltered.length}
+                {previewSearchQuery.trim() ? ` (filtered from ${previewWithMappings.length})` : ""}
               </span>
               <div className="flex gap-2">
                 <button

@@ -3,6 +3,30 @@ import { homeContent, tourSteps } from "../content/pipelineContent";
 import { useFinalOutputStatus } from "../hooks/useFinalOutputStatus";
 import { usePipelineRuntime } from "../hooks/usePipelineRuntime";
 
+const homeCtaClass =
+  "inline-flex h-full min-h-16 w-full items-center justify-center rounded-full border px-3 py-2.5 text-center text-sm font-semibold leading-snug transition sm:px-4 sm:py-3";
+
+function ExternalLinkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  );
+}
+
 export function HomePage() {
   const first = tourSteps[0];
   const { status, loading, starting, error, startRun } = usePipelineRuntime();
@@ -11,7 +35,7 @@ export function HomePage() {
   const recentLogs = status.logs.slice(-8);
 
   return (
-    <article className="mx-auto max-w-2xl">
+    <article className="mx-auto max-w-4xl">
       <p className="text-[0.65rem] font-semibold uppercase tracking-[0.4em] text-accent">
         Real Estate Analytics
       </p>
@@ -32,56 +56,77 @@ export function HomePage() {
         ))}
       </ul>
 
-      <div className="mt-14 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
-        <button
-          type="button"
-          onClick={() => void startRun()}
-          disabled={status.running || starting}
-          className="rainbow-glow-button star-hint-button inline-flex min-h-14 w-full items-center justify-center rounded-full border border-amber-400/40 bg-amber-400/10 px-6 py-3 text-center text-sm font-semibold text-amber-100 transition hover:border-amber-300/60 hover:bg-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {status.running || starting ? "Pipeline running..." : "Start backend pipeline"}
-        </button>
-        <Link
-          to="/live-demo"
-          className="star-hint-button inline-flex min-h-14 w-full items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/10 px-6 py-3 text-center text-sm font-semibold text-emerald-100 transition hover:border-emerald-400/60 hover:bg-emerald-500/15"
-        >
-          Pipeline step demo (latest run)
-        </Link>
-        {finalOutputStatus.available && (
-          <Link
-            to="/analysis-report"
-            className="rainbow-glow-button star-hint-button inline-flex min-h-14 w-full items-center justify-center rounded-full border border-cyan-500/40 bg-cyan-500/10 px-6 py-3 text-center text-sm font-semibold text-cyan-100 transition hover:border-cyan-400/60 hover:bg-cyan-500/15"
+      <section
+        className="mt-14 rounded-3xl border border-white/[0.07] bg-gradient-to-b from-canvas-elevated/50 via-canvas-elevated/25 to-transparent p-6 shadow-card backdrop-blur-sm sm:p-8"
+        aria-labelledby="home-quick-actions-heading"
+      >
+        <div className="mb-6 border-b border-white/[0.06] pb-6 text-center sm:text-left">
+          <h2 id="home-quick-actions-heading" className="text-lg font-semibold tracking-tight text-ink">
+            Quick actions
+          </h2>
+          <p className="mt-1.5 max-w-2xl text-sm text-ink-muted">
+            Pipeline, demos, docs. GitHub opens in a new tab below.
+          </p>
+        </div>
+
+        <div className="grid items-stretch gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          <button
+            type="button"
+            onClick={() => void startRun()}
+            disabled={status.running || starting}
+            className={`rainbow-glow-button ${homeCtaClass} border border-amber-400/40 bg-amber-400/10 text-amber-100 hover:border-amber-300/60 hover:bg-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60`}
           >
-            Open output dashboard
+            {status.running || starting ? "Pipeline running..." : "Start backend pipeline"}
+          </button>
+          <Link
+            to="/live-demo"
+            className={`${homeCtaClass} border border-emerald-500/40 bg-emerald-500/10 text-emerald-100 hover:border-emerald-400/60 hover:bg-emerald-500/15`}
+          >
+            Pipeline step demo (latest run)
           </Link>
-        )}
-        <Link
-          to="/data-mapping"
-          className="star-hint-button inline-flex min-h-14 w-full items-center justify-center rounded-full border border-pink-500/40 bg-pink-500/10 px-6 py-3 text-center text-sm font-semibold text-pink-100 transition hover:border-pink-400/60 hover:bg-pink-500/15"
-        >
-          Data mapping config
-        </Link>
-        <Link
-          to="/integration-capabilities"
-          className="inline-flex min-h-14 w-full items-center justify-center rounded-full border border-violet-500/40 bg-violet-500/10 px-6 py-3 text-center text-sm font-semibold text-violet-100 transition hover:border-violet-400/60 hover:bg-violet-500/15"
-        >
-          Explain modeling and governance
-        </Link>
-        <Link
-          to={first.path}
-          className="star-hint-button inline-flex min-h-14 w-full items-center justify-center rounded-full border border-accent/40 bg-accent/15 px-6 py-3 text-center text-sm font-semibold text-accent-glow shadow-glow transition hover:border-accent/60 hover:bg-accent/20"
-        >
-          Start pipeline tour
-        </Link>
-        <a
-          className="inline-flex min-h-14 w-full items-center justify-center rounded-full border border-white/10 bg-white/[0.03] px-6 py-3 text-center text-sm font-semibold text-ink-muted transition hover:border-accent/30 hover:bg-white/[0.05] hover:text-ink"
-          href="https://github.com/YUANDONG-YANG/data-analysis"
-          target="_blank"
-          rel="noreferrer"
-        >
-          View on GitHub
-        </a>
-      </div>
+          {finalOutputStatus.available && (
+            <Link
+              to="/analysis-report"
+              className={`rainbow-glow-button ${homeCtaClass} border border-cyan-500/40 bg-cyan-500/10 text-cyan-100 hover:border-cyan-400/60 hover:bg-cyan-500/15`}
+            >
+              Open output dashboard
+            </Link>
+          )}
+          <Link
+            to="/data-mapping"
+            className={`${homeCtaClass} border border-pink-500/40 bg-pink-500/10 text-pink-100 hover:border-pink-400/60 hover:bg-pink-500/15`}
+          >
+            Data mapping config
+          </Link>
+          <Link
+            to="/integration-capabilities"
+            className={`${homeCtaClass} border border-violet-500/40 bg-violet-500/10 text-violet-100 hover:border-violet-400/60 hover:bg-violet-500/15`}
+          >
+            Explain modeling and governance
+          </Link>
+          <Link
+            to={first.path}
+            className={`${homeCtaClass} border border-accent/40 bg-accent/15 text-accent-glow shadow-glow hover:border-accent/60 hover:bg-accent/20`}
+          >
+            Start pipeline tour
+          </Link>
+        </div>
+
+        <div className="mt-8 flex flex-col items-center border-t border-white/[0.08] pt-8">
+          <a
+            className={`star-hint-button ${homeCtaClass} w-full max-w-md border border-dashed border-accent/45 bg-gradient-to-br from-white/[0.06] to-accent/[0.1] text-ink shadow-[0_0_0_1px_rgba(56,189,248,0.06)] hover:border-accent/70 hover:from-white/[0.09] hover:to-accent/[0.14] hover:text-ink sm:max-w-lg`}
+            href="https://github.com/YUANDONG-YANG/data-analysis"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View repository on GitHub (opens in a new tab)"
+          >
+            <span className="inline-flex items-center justify-center gap-2">
+              View on GitHub
+              <ExternalLinkIcon className="h-4 w-4 flex-shrink-0 text-accent opacity-90" />
+            </span>
+          </a>
+        </div>
+      </section>
 
       <section className="mt-10 rounded-3xl border border-white/[0.06] bg-canvas-elevated/50 p-6 shadow-card">
         <div className="flex flex-wrap items-start justify-between gap-3">

@@ -1,10 +1,6 @@
 import mermaid from "mermaid";
 import { useEffect, useId, useRef, useState } from "react";
 
-/**
- * Use a translucent dark diagram surface so architecture diagrams blend into the
- * product background instead of appearing as a bright white sheet.
- */
 let mermaidConfigured = false;
 
 function configureMermaid() {

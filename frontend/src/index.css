@@ -73,12 +73,6 @@
   scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
-/* Firefox scrollbar */
-.data-preview-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-}
-
 /* Progress bar shimmer animation */
 @keyframes progress-shimmer {
   0% {

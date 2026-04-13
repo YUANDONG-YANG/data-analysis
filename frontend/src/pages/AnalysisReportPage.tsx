@@ -1,4 +1,11 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  type ComponentProps,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Papa from "papaparse";
 import { Link, Navigate } from "react-router-dom";
 import {
@@ -146,7 +153,7 @@ function ChartTooltip({
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-slate-950/95 px-4 py-3 shadow-xl">
+    <div className="rounded-2xl border border-sky-500/20 bg-slate-950/95 px-4 py-3 shadow-xl shadow-cyan-950/20">
       {label && <p className="mb-2 font-mono text-sm text-ink">{label}</p>}
       <div className="space-y-1.5">
         {payload.map((entry) => (
@@ -162,6 +169,16 @@ function ChartTooltip({
       </div>
     </div>
   );
+}
+
+const tooltipCursor = {
+  fill: "rgba(8, 61, 78, 0.52)",
+  stroke: "rgba(34, 211, 238, 0.38)",
+  strokeWidth: 1,
+};
+
+function TooltipWithCursor({ cursor, ...props }: ComponentProps<typeof Tooltip>) {
+  return <Tooltip cursor={cursor ?? tooltipCursor} {...props} />;
 }
 
 export function AnalysisReportPage() {
@@ -619,9 +636,7 @@ export function AnalysisReportPage() {
                       height={60}
                     />
                     <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                    <Tooltip
-                      content={<ChartTooltip kind="number" />}
-                    />
+                    <TooltipWithCursor content={<ChartTooltip kind="number" />} />
                     <Legend />
                     <Line
                       type="monotone"
@@ -664,9 +679,7 @@ export function AnalysisReportPage() {
                       stroke="#94a3b8"
                       tick={{ fontSize: 12 }}
                     />
-                    <Tooltip
-                      content={<ChartTooltip kind="number" />}
-                    />
+                    <TooltipWithCursor content={<ChartTooltip kind="number" />} />
                     <Legend />
                     <Bar
                       dataKey="target_sales"
@@ -702,7 +715,7 @@ export function AnalysisReportPage() {
                       tick={{ fontSize: 12 }}
                       tickFormatter={(value) => `${value}%`}
                     />
-                    <Tooltip content={<ChartTooltip kind="percent" />} />
+                    <TooltipWithCursor content={<ChartTooltip kind="percent" />} />
                     <Legend />
                     <Line
                       type="monotone"
@@ -738,9 +751,7 @@ export function AnalysisReportPage() {
                       tick={{ fontSize: 12 }}
                       tickFormatter={(value) => `${value}%`}
                     />
-                    <Tooltip
-                      content={<ChartTooltip kind="percent" />}
-                    />
+                    <TooltipWithCursor content={<ChartTooltip kind="percent" />} />
                     <Legend />
                     <Line
                       type="monotone"
@@ -806,12 +817,12 @@ export function AnalysisReportPage() {
                       width={100}
                       tick={{ fontSize: 12 }}
                     />
-                    <Tooltip
+                    <TooltipWithCursor
                       content={({ active, payload }) => {
                         if (!active || !payload || !payload.length) return null;
                         const data = payload[0].payload;
                         return (
-                          <div className="rounded-lg border border-white/10 bg-canvas-elevated/95 px-3 py-2 shadow-xl backdrop-blur-sm">
+                          <div className="rounded-lg border border-sky-500/25 bg-canvas-elevated/95 px-3 py-2 shadow-xl shadow-cyan-950/30 backdrop-blur-sm">
                             <p className="mb-1 text-xs font-medium text-ink">{data.stage}</p>
                             <p className="text-sm font-semibold text-accent-glow">
                               {DECIMAL_FORMATTER.format(data.count)} ({percent(data.rate)})
@@ -851,9 +862,7 @@ export function AnalysisReportPage() {
                       width={120}
                       tick={{ fontSize: 12 }}
                     />
-                    <Tooltip
-                      content={<ChartTooltip kind="number" />}
-                    />
+                    <TooltipWithCursor content={<ChartTooltip kind="number" />} />
                     <Legend />
                     <Bar dataKey="actual_sales" name="Actual sales" fill="#38bdf8" radius={[0, 6, 6, 0]} />
                     <Bar dataKey="target_sales" name="Target sales" fill="#34d399" radius={[0, 6, 6, 0]} />
@@ -871,9 +880,7 @@ export function AnalysisReportPage() {
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
                     <XAxis dataKey="builder" stroke="#94a3b8" tick={{ fontSize: 12 }} />
                     <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                    <Tooltip
-                      content={<ChartTooltip kind="number" />}
-                    />
+                    <TooltipWithCursor content={<ChartTooltip kind="number" />} />
                     <Legend />
                     <Bar dataKey="actual_sales" name="Actual sales" fill="#38bdf8" radius={[6, 6, 0, 0]} />
                     <Bar dataKey="target_sales" name="Target sales" fill="#34d399" radius={[6, 6, 0, 0]} />
@@ -901,9 +908,7 @@ export function AnalysisReportPage() {
                         <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      content={<ChartTooltip kind="currency" />}
-                    />
+                    <TooltipWithCursor cursor={false} content={<ChartTooltip kind="currency" />} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
