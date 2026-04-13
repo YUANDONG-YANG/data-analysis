@@ -1,114 +1,44 @@
 # Real Estate Heterogeneous Data Analytics
 
-Pipeline for combining sales, targets, CRM, and web traffic data to generate monthly community-level reports (heterogeneous real-estate sources).
+A data-integration assessment project that **blends file-based sales and targets with API-backed CRM and web-traffic feeds**, then produces **month × community × builder** metrics for reporting and exploration.
 
-## Data Sources
+---
 
-- Sales data: CSV files with home sales records (two builders)
-- Target data: CSV/Excel files with monthly sales targets
-- CRM data: Lead data from API
-- Web traffic: Website traffic metrics from API
+## Design philosophy
 
-## Output
+### Medallion-style data layers
 
-Monthly community-level reports including:
+The repo organizes data by **quality stage**, not by ad-hoc folders:
 
-**Note**: Output includes future target-only months (through 2026-12) for planning. These records have zero actual sales and represent forecast data.
+| Layer | Role |
+|--------|------|
+| **Bronze** (`data/bronze/`) | Raw, immutable inputs (CSV/Excel sales and targets). |
+| **Silver** (`data/silver/`) | Cleaned, deduplicated, standardized tables written after each processing step—useful for audit and debugging. |
+| **Gold** (`data/gold/`) | Final business outputs: metrics CSV, HTML analysis report, JSON step logs, and runtime status consumed by tooling and the UI. |
 
-**Required metrics:** actual sales, target sales, variance, CRM lead count, web traffic (sessions).
+This keeps **ingestion**, **transformation**, and **consumption** visually and operationally separate: you always know whether you are looking at source files, intermediate quality, or publishable results.
 
-**Additional metrics:** estimated revenue, achievement rate, estimated average sale price, conversion rate (leads to sales), traffic to sales rate.
+### Application architecture
 
-## Project Structure
+- **Composition root** (`src/main.py`) loads configuration, builds collaborators, and runs the pipeline—no hidden globals.
+- **Dependency injection** (`src/di/`) wires repositories and services so orchestration stays testable and explicit.
+- **Factories** (`RepositoryFactory`, `ServiceFactory`) construct object graphs from config without leaking construction details into domain code.
+- **Repositories** abstract **where** data comes from (`FileRepository` for bronze files, `APIRepository` for CRM and traffic).
+- **Application services** coordinate use cases: `DataService` loads and processes each domain; `MetricsService` computes KPIs; **`PipelineService`** is the façade that runs the fixed **load → metrics → save** workflow and structured logging.
 
-```
-real-estate-heterogeneous-analytics/
-├── README.md
-├── requirements.txt
-├── config.yaml
-├── data/
-│   ├── bronze/       # 🥉 Bronze layer: Raw source data (read-only)
-│   ├── silver/       # 🥈 Silver layer: Cleaned & standardized data
-│   └── gold/         # 🥇 Gold layer: Business-aggregated reports
-└── src/
-    ├── main.py       # Entry point
-    ├── core/
-    ├── repositories/
-    ├── services/
-    ├── factories/
-    └── di/
-```
+The mental model is: **config-driven wiring**, **clear boundaries** between infrastructure and business steps, and a **single orchestrated pipeline** instead of scattered scripts.
 
-## Data Architecture (Medallion Pattern)
+### What the front end is for
 
-This project follows the **Medallion Architecture** with three data quality layers:
+The **Vite + React** app under `frontend/` is the primary way to **read the story of the system**: guided pipeline content (aligned with `docs/`), Mermaid-style diagrams in the browser, a **step-by-step live demo**, and charts driven by the gold-layer CSV when present. You do **not** need Python or MkDocs running to use it for exploration—the dev server can serve **sample** pipeline JSON when `data/gold/` has not been generated yet.
 
-### 🥉 Bronze Layer (`data/bronze/`)
-- **Purpose**: Raw data ingestion zone
-- **Characteristics**: Immutable source files, no transformations
-- **Contents**:
-  - `sales_builder_a.csv`, `sales_builder_b.csv` - Raw sales records
-  - `target_sales_builder_a.xlsx`, `target_sales_builder_b.csv` - Raw target data
-- **Used by**: `FileRepository`, `APIRepository`
+---
 
-### 🥈 Silver Layer (`data/silver/`)
-- **Purpose**: Cleaned and standardized zone
-- **Characteristics**: Deduplicated, outlier-filtered, date/community standardized
-- **Contents** (generated after pipeline execution):
-  - `sales_processed.csv` - Cleaned sales with standardized dates and communities
-  - `targets_processed.csv` - Cleaned targets with normalized communities
-  - `crm_processed.csv` - Standardized CRM leads with unified date formats
-  - `web_traffic_processed.csv` - Processed web traffic with community mapping
-- **Used by**: Intermediate storage for audit, debugging, and downstream analysis
+## Getting started (front end only)
 
-### 🥇 Gold Layer (`data/gold/`)
-- **Purpose**: Business-aggregated reporting zone
-- **Characteristics**: Final metrics table (month × community × builder)
-- **Contents**:
-  - `final_dataframe.csv` - Final metrics with KPIs and derived rates
-  - `pipeline_analysis_report.html` - Quality report and execution summary
-  - `pipeline_steps_report.json` - Detailed step-by-step execution log
-  - `pipeline_runtime_status.json` - Real-time pipeline status for frontend
-- **Used by**: Analytics dashboards, business intelligence tools, downstream systems
+**Prerequisites:** [Node.js](https://nodejs.org/) (LTS recommended) and **npm**.
 
-## Installation
-
-Python 3.8+ required.
-
-```bash
-pip install -r requirements.txt
-```
-
-## Configuration
-
-Edit `config.yaml`: API endpoints, data paths, logging, and optional `community_names` (aliases and URL path slugs for normalization).
-
-## Quick Start
-
-### 1. Install Python dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Run the backend pipeline
-
-From the repository root:
-
-```bash
-python -m src.main
-```
-
-This generates the latest output files under `data/gold/`, including:
-
-- `final_dataframe.csv`
-- `pipeline_analysis_report.html`
-- `pipeline_steps_report.json`
-- `pipeline_runtime_status.json`
-
-### 3. Start the front-end UI
-
-The repository also includes a React front-end under `frontend/` for the pipeline tour, the live step-by-step demo, and the integration/governance explanation pages.
+From the **repository root**:
 
 ```bash
 cd frontend
@@ -116,67 +46,18 @@ npm install
 npm run dev
 ```
 
-Then open the local URL printed by Vite (typically **`http://127.0.0.1:5173/`**).
+Open the URL Vite prints—typically **`http://127.0.0.1:5173`**.
 
-### 4. Use the live pipeline demo
+That is all you need to browse the UI. If `data/gold/pipeline_steps_report.json` (and related outputs) exist from a prior backend run, the **live demo** and analysis pages will show **real** run data; otherwise the app falls back to bundled sample JSON under `frontend/public/` so the tour still works offline.
 
-To see the latest real pipeline output in **`/live-demo`**, run the backend pipeline first as shown above. The front-end reads:
+---
 
-- `data/output/pipeline_steps_report.json`
-- `data/output/pipeline_runtime_status.json`
+## Optional: backend pipeline
 
-You can also start the backend pipeline directly from the front-end home page using the **Start backend pipeline** button.
+To regenerate **Gold** artifacts (CSV, reports, JSON) yourself, use Python 3.8+, install `requirements.txt`, configure `config.yaml`, then from the repo root run `python -m src.main`. The front end reads outputs under **`data/gold/`** (see `frontend/vite.config.ts` for dev proxies). This step is **not** required simply to start and explore the front end.
 
-## Running
+---
 
-If you only want to run the backend pipeline without the front-end:
+## License & context
 
-```bash
-python src/main.py
-```
-
-## Documentation
-
-### MkDocs (recommended: full site + Mermaid)
-
-Install dependencies (includes MkDocs), then build and optionally serve:
-
-```bash
-pip install -r requirements.txt
-mkdocs build --strict
-```
-
-- Static HTML output is written to **`site/`** (open `site/index.html` or use a local static server).
-- Live preview: `mkdocs serve` → **http://127.0.0.1:8081/**
-
-Configuration: **`mkdocs.yml`** (and **`mkdocs_hooks.py`**, which lowers mermaid2 plugin log noise during `mkdocs build`). Pipeline chapters and `ARCHITECTURE.md` files (via `docs/reference/`) are in the nav; Mermaid diagrams use **`mkdocs-mermaid2-plugin`**.
-
-### Simple Markdown server (optional)
-
-```bash
-python docs_server.py
-```
-
-Opens **http://localhost:8081/** with a lightweight index (see `start_docs_server.bat` on Windows). Override port with env `DOCS_SERVER_PORT`.
-
-## Testing
-
-```bash
-pytest
-pytest --cov=src.services --cov=src.core.calculators --cov=src.core.processors --cov-report=html
-```
-
-## Data Quality Processing
-
-- Date format standardization (multiple formats supported)
-- Community name normalization (config-driven variants)
-- Outlier filtering (removes extreme values)
-- Missing value handling
-
-## Output Format
-
-Output CSV: `data/output/final_dataframe.csv`
-
-Columns: `month`, `community_name`, `builder`, `actual_sales`, `target_sales`, `variance`, `crm_leads`, `web_traffic`, `estimated_revenue`, `achievement_rate`, `estimated_avg_sale_price`, `conversion_rate`, `traffic_to_sales_rate`.
-
-Sorted by: month (asc), builder (asc), community_name (asc).
+This repository is structured as an assessment/demo: heterogeneous real-estate sources (files + APIs) are merged into one analytical surface, with emphasis on clear layering, explicit wiring, and inspectable outputs.

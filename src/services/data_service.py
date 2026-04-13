@@ -134,103 +134,104 @@ class DataService:
         Load and process CRM data from API.
         
         Returns:
-            Processed CRM DataFrame (empty if API not available)
+            Processed CRM DataFrame
             
         Raises:
-            DataProcessError: If processing fails
+            DataProcessError: If API is not configured, returns no data, or processing fails
         """
         if not self.api_repository:
-            return pd.DataFrame()
-        
+            raise DataProcessError(
+                "Cannot load CRM data: API repository is not configured",
+                operation="load_and_process_crm_data",
+            )
+
+        logger = logging.getLogger(__name__)
         try:
             crm_list = self.api_repository.load_all_crm_data()
             if not crm_list:
-                return pd.DataFrame()
-            
-            logger = logging.getLogger(__name__)
+                raise DataProcessError(
+                    "CRM API returned no datasets (empty list)",
+                    operation="load_and_process_crm_data",
+                )
+
             total_raw = sum(len(df) for df in crm_list)
             logger.info(
                 f"CRM data loaded: {len(crm_list)} builders, {total_raw} total records",
                 extra={'context': {'data_type': 'crm', 'builders': len(crm_list), 'total_raw_records': total_raw}}
             )
-            
+
             merged = self.data_processor.merge_dataframes(crm_list)
             if merged.empty:
-                logger.warning("CRM data merged but result is empty")
-                return pd.DataFrame()
-            
+                raise DataProcessError(
+                    "CRM API returned no records (merged result is empty)",
+                    operation="load_and_process_crm_data",
+                )
+
             logger.info(
                 f"CRM data merged: {len(merged)} records",
                 extra={'context': {'data_type': 'crm', 'merged_records': len(merged)}}
             )
-            
+
             processed = self.data_processor.process_crm_data(merged)
-            
+
             logger.info(
                 f"CRM data processed: {len(processed)} records after processing",
                 extra={'context': {'data_type': 'crm', 'processed_records': len(processed)}}
             )
-            
+
             # Save to Silver layer (processed data zone)
             self._save_to_silver_layer(processed, "crm_processed.csv")
-            
+
             return processed
+        except DataProcessError:
+            raise
         except Exception as e:
-            # Log warning but return empty DataFrame (graceful degradation)
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                f"Failed to load CRM data, continuing with empty DataFrame: {e}",
-                extra={
-                    'context': {
-                        'data_type': 'crm',
-                        'error_type': type(e).__name__,
-                        'graceful_degradation': True
-                    }
-                },
-                exc_info=True
-            )
-            return pd.DataFrame()
+            raise DataProcessError(
+                f"Failed to load and process CRM data: {e}",
+                operation="load_and_process_crm_data",
+            ) from e
     
     def load_and_process_web_traffic_data(self) -> pd.DataFrame:
         """
         Load and process web traffic data from API.
         
         Returns:
-            Processed web traffic DataFrame (empty if API not available)
+            Processed web traffic DataFrame
             
         Raises:
-            DataProcessError: If processing fails
+            DataProcessError: If API is not configured, returns no data, or processing fails
         """
         if not self.api_repository:
-            return pd.DataFrame()
-        
+            raise DataProcessError(
+                "Cannot load web traffic data: API repository is not configured",
+                operation="load_and_process_web_traffic_data",
+            )
+
         try:
             traffic_list = self.api_repository.load_all_web_traffic_data()
             if not traffic_list:
-                return pd.DataFrame()
-            
+                raise DataProcessError(
+                    "Web traffic API returned no datasets (empty list)",
+                    operation="load_and_process_web_traffic_data",
+                )
+
             merged = self.data_processor.merge_dataframes(traffic_list)
             if merged.empty:
-                return pd.DataFrame()
-            
+                raise DataProcessError(
+                    "Web traffic API returned no records (merged result is empty)",
+                    operation="load_and_process_web_traffic_data",
+                )
+
             processed = self.data_processor.process_web_traffic_data(merged)
-            
+
             # Save to Silver layer (processed data zone)
             self._save_to_silver_layer(processed, "web_traffic_processed.csv")
-            
+
             return processed
+        except DataProcessError:
+            raise
         except Exception as e:
-            # Log warning but return empty DataFrame (graceful degradation)
-            logger = logging.getLogger(__name__)
-            logger.warning(
-                f"Failed to load web traffic data, continuing with empty DataFrame: {e}",
-                extra={
-                    'context': {
-                        'data_type': 'web_traffic',
-                        'error_type': type(e).__name__,
-                        'graceful_degradation': True
-                    }
-                },
-                exc_info=True
-            )
-            return pd.DataFrame()
+            raise DataProcessError(
+                f"Failed to load and process web traffic data: {e}",
+                operation="load_and_process_web_traffic_data",
+            ) from e
