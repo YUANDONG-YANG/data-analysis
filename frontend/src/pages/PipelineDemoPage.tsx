@@ -113,7 +113,7 @@ export function PipelineDemoPage() {
             type="button"
             onClick={() => void runtimeState.startRun()}
             disabled={runtimeState.status.running || runtimeState.starting}
-            className="rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-xs font-semibold text-amber-100 transition hover:border-amber-300/60 hover:bg-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rainbow-glow-button rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-xs font-semibold text-amber-100 transition hover:border-amber-300/60 hover:bg-amber-400/15 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {runtimeState.status.running || runtimeState.starting ? "Pipeline running..." : "Start backend pipeline"}
           </button>
@@ -154,26 +154,57 @@ export function PipelineDemoPage() {
 
       {/* Stepper */}
       <div className="mt-10">
-        <div className="flex flex-wrap items-center gap-2">
-          {steps.map((s, i) => (
-            <button
-              key={s.step}
-              type="button"
-              onClick={() => setIdx(i)}
-              className={
-                i === idx
-                  ? "rounded-full bg-accent px-3 py-1.5 font-mono text-xs font-semibold text-canvas shadow-glow"
-                  : "rounded-full border border-white/10 bg-canvas-elevated/50 px-3 py-1.5 font-mono text-xs text-ink-muted transition hover:border-accent/30 hover:text-ink"
-              }
-            >
-              {s.step}
-            </button>
-          ))}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-ink">Pipeline Progress</span>
+            <span className="rounded-full bg-accent/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-accent">
+              {runtimeState.status.running ? runtimeSteps.length : steps.length} / {steps.length}
+            </span>
+          </div>
+          <span className="font-mono text-sm text-ink-muted">
+            {steps.length > 0 
+              ? Math.round(((runtimeState.status.running ? runtimeSteps.length : steps.length) / steps.length) * 100) 
+              : 0}%
+          </span>
         </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-canvas-subtle">
+        <div className="flex flex-wrap items-center gap-2">
+          {steps.map((s, i) => {
+            const isCompleted = runtimeState.status.running ? i < runtimeSteps.length : i < steps.length;
+            const isCurrent = i === idx;
+            const isRunning = runtimeState.status.running && i === runtimeSteps.length;
+            
+            return (
+              <button
+                key={s.step}
+                type="button"
+                onClick={() => setIdx(i)}
+                className={
+                  isCurrent
+                    ? "rounded-full bg-accent px-3 py-1.5 font-mono text-xs font-semibold text-canvas shadow-glow"
+                    : isCompleted
+                      ? "rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs text-emerald-200 transition hover:bg-emerald-500/15"
+                      : "rounded-full border border-white/10 bg-canvas-elevated/50 px-3 py-1.5 font-mono text-xs text-ink-muted transition hover:border-accent/30 hover:text-ink"
+                }
+              >
+                {isCompleted && "✓ "}
+                {isRunning && "⟳ "}
+                {s.step}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-canvas-subtle shadow-inner">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-accent to-accent-glow transition-all duration-500"
-            style={{ width: `${((idx + 1) / steps.length) * 100}%` }}
+            className={`h-full rounded-full bg-gradient-to-r transition-all duration-700 ${
+              runtimeState.status.running
+                ? "from-emerald-500 via-accent to-accent-glow animate-progress-shimmer"
+                : "from-accent to-accent-glow"
+            }`}
+            style={{ 
+              width: `${steps.length > 0 
+                ? ((runtimeState.status.running ? runtimeSteps.length : steps.length) / steps.length) * 100 
+                : 0}%` 
+            }}
           />
         </div>
       </div>
@@ -193,8 +224,60 @@ export function PipelineDemoPage() {
             </p>
           </div>
         )}
+        {!runtimeState.status.running && source === "live" && steps.length > 0 && idx === steps.length - 1 && (
+          <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 to-cyan-950/30 p-6 shadow-lg">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-2xl">
+                ✓
+              </div>
+              <div className="flex-1">
+                <p className="text-lg font-semibold text-emerald-100">
+                  Pipeline Completed Successfully
+                </p>
+                <p className="mt-2 text-sm text-emerald-200/80">
+                  All data processing steps have been executed. Gold layer data is now available.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2">
+                    <p className="text-xs font-medium uppercase tracking-wider text-emerald-300/70">
+                      Generated Files
+                    </p>
+                    <p className="mt-1 font-mono text-sm text-emerald-100">
+                      📊 data/gold/final_dataframe.csv
+                    </p>
+                    <p className="font-mono text-sm text-emerald-100">
+                      📄 data/gold/pipeline_analysis_report.html
+                    </p>
+                    <p className="font-mono text-sm text-emerald-100">
+                      📋 data/gold/pipeline_steps_report.json
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-3 py-2">
+                    <p className="text-xs font-medium uppercase tracking-wider text-cyan-300/70">
+                      Next Steps
+                    </p>
+                    <Link
+                      to="/analysis-report"
+                      className="mt-1 inline-flex items-center gap-1.5 font-medium text-cyan-100 transition hover:text-cyan-50"
+                    >
+                      <span>View Output Dashboard</span>
+                      <span className="text-lg">→</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <div>
-          <h2 className="font-mono text-sm text-accent">{step.step}</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="font-mono text-sm text-accent">{step.step}</h2>
+            {!runtimeState.status.running && source === "live" && steps.length > 0 && (
+              <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-200">
+                Completed
+              </span>
+            )}
+          </div>
           <p className="mt-1 text-2xl font-semibold text-ink">{step.title}</p>
           {step.duration_sec != null && (
             <p className="mt-2 font-mono text-sm text-ink-muted">

@@ -1,45 +1,32 @@
-# Configuration file
 api:
-  base_url: "https://builder-api-875175326233.us-central1.run.app/builder-api"
+  base_url: https://builder-api-875175326233.us-central1.run.app/builder-api
   timeout: 30
-  api_key: "bapi_sk_c8f9a2b7e4d1c5a3f6b9d2e7a1c4b8f5"
+  api_key: bapi_sk_c8f9a2b7e4d1c5a3f6b9d2e7a1c4b8f5
   endpoints:
-    crm: "/crm"
-    web_traffic: "/web-traffic"
-
-# Data layer architecture (Medallion Architecture pattern)
-# Three-tier data pipeline: Bronze → Silver → Gold
+    crm: /crm
+    web_traffic: /web-traffic
 data:
-  # 🥉 Bronze layer: Raw ingestion zone
-  # - Immutable source data from files and APIs
-  # - No transformations, preserves original format
-  # - Used by FileRepository and APIRepository
-  raw_path: "data/bronze"
-  
-  # 🥈 Silver layer: Cleaned and standardized zone
-  # - Deduplicated, outlier-filtered, date/community standardized
-  # - Business-ready DataFrames after DataProcessor transformation
-  # - Intermediate storage for audit and debugging
-  processed_path: "data/silver"
-  
-  # 🥇 Gold layer: Business-aggregated reporting zone
-  # - Final metrics table: month × community × builder
-  # - Consumed by analytics, dashboards, and downstream systems
-  # - Includes final_dataframe.csv, quality reports, and checksums
-  output_path: "data/gold"
-
+  raw_path: data/bronze
+  processed_path: data/silver
+  output_path: data/gold
 logging:
-  level: "INFO"
-
-# Community display names: edit here instead of Python when adding variants or URL slugs.
+  level: INFO
 community_names:
   aliases:
-    "Riverbend TH": "Riverbend Townhomes"
-    "FairviewEstates": "Fairview Estates"
-    "Fairview Est.": "Fairview Estates"
-    "Maplewood-Heights": "Maplewood Heights"
-    "Maplewood Heights - Phase 2": "Maplewood Heights"
-    "Fairview Estates - Phase 2": "Fairview Estates"
+    Riverbend TH: Riverbend Townhomes
+    FairviewEstates: Fairview Estates
+    Fairview Est.: Fairview Estates
+    Maplewood-Heights: Maplewood Heights
+    Maplewood Heights - Phase 2: Maplewood Heights
+    Fairview Estates - Phase 2: Fairview Estates
+    Cedar Creek: Cedar Creek
+    Fairview Estates: Fairview Estates
+    Glenview Meadows: Glenview Meadows
+    Riverbend Townhomes: Riverbend Townhomes
+    Maplewood Heights: Maplewood Heights
+    Oakridge Villas: Oakridge Villas
+    Willow Creek Meadows: Willow Creek Meadows
+    Sunset Pines: Sunset Pines
   path_slugs:
     - fairview-estates
     - riverbend-townhomes
@@ -49,12 +36,3 @@ community_names:
     - maplewood-heights
     - oakridge-villas
     - sunset-pines
-
-# Optional:
-# If you want to tune outlier thresholds without touching code, you can put them here and
-# wire them into `src/core/processors/data_processor.py::clean_data`.
-#
-# data_quality:
-#   price_range: [100000, 10000000]
-#   sqft_range: [500, 10000]
-#   outlier_detection: true

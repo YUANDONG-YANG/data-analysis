@@ -24,6 +24,23 @@ export function DocLayout() {
         </div>
         <nav className="flex-1 overflow-y-auto px-3 py-4">
           <p className="mb-2 px-3 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-ink-faint">
+            Configuration
+          </p>
+          <div className="mb-6 space-y-0.5">
+            <Link
+              to="/data-mapping"
+              className={clsx(
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                location.pathname === "/data-mapping"
+                  ? "bg-pink-500/10 text-pink-200 shadow-[inset_0_0_0_1px_hsl(330_81%_60%_/_0.35)]"
+                  : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
+              )}
+            >
+              <span className="font-mono text-[0.7rem] text-ink-faint">⚙</span>
+              <span className="font-medium">Data mapping config</span>
+            </Link>
+          </div>
+          <p className="mb-2 px-3 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-ink-faint">
             Runtime
           </p>
           <div className="mb-6 space-y-0.5">
@@ -43,7 +60,7 @@ export function DocLayout() {
               <Link
                 to="/analysis-report"
                 className={clsx(
-                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                  "rainbow-glow-button flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
                   location.pathname === "/analysis-report"
                     ? "bg-cyan-500/10 text-cyan-200 shadow-[inset_0_0_0_1px_hsl(191_91%_36%_/_0.35)]"
                     : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
@@ -111,8 +128,10 @@ export function DocLayout() {
         <select
           className="max-w-[55vw] rounded-lg border border-white/10 bg-canvas-elevated px-2 py-1.5 text-xs text-ink"
           value={
-            location.pathname === "/live-demo"
-              ? "/live-demo"
+            location.pathname === "/data-mapping"
+              ? "/data-mapping"
+              : location.pathname === "/live-demo"
+                ? "/live-demo"
               : showOutputDashboard && location.pathname === "/analysis-report"
                 ? "/analysis-report"
               : location.pathname === "/integration-capabilities"
@@ -124,6 +143,7 @@ export function DocLayout() {
           onChange={(e) => navigate(e.target.value)}
         >
           <option value="/">Home</option>
+          <option value="/data-mapping">⚙ Data mapping config</option>
           <option value="/live-demo">Pipeline step demo</option>
           {showOutputDashboard && <option value="/analysis-report">Output dashboard</option>}
           <option value="/integration-capabilities">Integration capabilities</option>

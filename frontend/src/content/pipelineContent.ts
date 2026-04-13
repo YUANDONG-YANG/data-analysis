@@ -39,6 +39,7 @@ flowchart LR
         direction TB
         CSV[Sales CSV<br/>Targets Excel/CSV]
         API[CRM API<br/>Web Traffic API]
+        SPACER1[ ]
     end
     
     subgraph Silver["🥈 Silver Layer<br/>(data/silver/)"]
@@ -53,6 +54,7 @@ flowchart LR
         direction TB
         FD[final_dataframe.csv<br/>✓ Month × Community × Builder<br/>✓ KPIs & derived rates]
         RPT[pipeline_analysis_report.html<br/>pipeline_steps_report.json]
+        SPACER2[ ]
     end
     
     CSV --> SP
@@ -67,13 +69,15 @@ flowchart LR
     
     FD --> RPT
     
-    classDef bronzeStyle fill:#3d2817,stroke:#d4a574,stroke-width:2px,color:#fff
-    classDef silverStyle fill:#2c3e50,stroke:#95a5a6,stroke-width:2px,color:#fff
-    classDef goldStyle fill:#1a472a,stroke:#f39c12,stroke-width:2px,color:#fff
+    classDef bronzeStyle fill:#1e2433,stroke:#4a5568,stroke-width:2px,color:#a0aec0,stroke-dasharray:0
+    classDef silverStyle fill:#1e2838,stroke:#4a90e2,stroke-width:2px,color:#93c5fd,stroke-dasharray:0
+    classDef goldStyle fill:#1e2d2d,stroke:#34d399,stroke-width:2px,color:#6ee7b7,stroke-dasharray:0
+    classDef spacerStyle fill:transparent,stroke:transparent,color:transparent
     
     class Bronze,CSV,API bronzeStyle
     class Silver,SP,TP,CP,WP silverStyle
-    class Gold,FD,RPT goldStyle`,
+    class Gold,FD,RPT goldStyle
+    class SPACER1,SPACER2 spacerStyle`,
       },
       {
         heading: "End-to-end data flow",
@@ -443,20 +447,20 @@ flowchart LR
         heading: "Six-step execution flow",
         mermaid: `%%{init: {'theme':'dark', 'themeVariables': { 'primaryColor':'#1e3a5f','primaryTextColor':'#e5eefc','primaryBorderColor':'#4a90e2','lineColor':'#6b9bd1','secondaryColor':'#2a4a6f','tertiaryColor':'#1a2332'}}}%%
 flowchart TB
-    Start([🚀 PipelineService.execute]):::startNode
+    Start([PipelineService.execute]):::startNode
     
-    subgraph DataIngestion["📥 Data Ingestion · Steps 1-4"]
-        S1["⚡ Step 1: Load Sales<br/><i>FileRepository → DataProcessor</i>"]:::dataNode
-        S2["⚡ Step 2: Load Targets<br/><i>FileRepository → DataProcessor</i>"]:::dataNode
-        S3["🔌 Step 3: Load CRM<br/><i>APIRepository → DataProcessor</i><br/><small>optional empty</small>"]:::optionalNode
-        S4["🔌 Step 4: Load Traffic<br/><i>APIRepository → DataProcessor</i><br/><small>optional empty</small>"]:::optionalNode
+    subgraph DataIngestion["Data Ingestion · Steps 1-4"]
+        S1["Step 1: Load Sales<br/><i>FileRepository → DataProcessor</i>"]:::dataNode
+        S2["Step 2: Load Targets<br/><i>FileRepository → DataProcessor</i>"]:::dataNode
+        S3["Step 3: Load CRM<br/><i>APIRepository → DataProcessor</i><br/><small>optional empty</small>"]:::optionalNode
+        S4["Step 4: Load Traffic<br/><i>APIRepository → DataProcessor</i><br/><small>optional empty</small>"]:::optionalNode
     end
     
-    S5["🧮 Step 5: Calculate Metrics<br/><i>MetricsService.calculate_metrics</i><br/>Aggregate 4 DataFrames"]:::metricsNode
+    S5["Step 5: Calculate Metrics<br/><i>MetricsService.calculate_metrics</i><br/>Aggregate 4 DataFrames<br/>&nbsp;"]:::metricsNode
     
-    S6["💾 Step 6: Persist Output<br/><i>sort · write CSV · MD5 checksum</i><br/>quality report · business summary"]:::outputNode
+    S6["Step 6: Persist Output<br/><i>sort · write CSV · MD5 checksum</i><br/>quality report · business summary"]:::outputNode
     
-    End([✅ return metrics DataFrame]):::endNode
+    End([return metrics DataFrame<br/>&nbsp;<br/>&nbsp;]):::endNode
     
     Start --> S1
     S1 --> S2
@@ -469,9 +473,9 @@ flowchart TB
     classDef startNode fill:#2563eb,stroke:#3b82f6,stroke-width:3px,color:#fff
     classDef dataNode fill:#1e40af,stroke:#3b82f6,stroke-width:2px,color:#e5eefc
     classDef optionalNode fill:#1e3a5f,stroke:#6366f1,stroke-width:2px,color:#c7d2fe,stroke-dasharray: 5 5
-    classDef metricsNode fill:#7c3aed,stroke:#a78bfa,stroke-width:2px,color:#e9d5ff
-    classDef outputNode fill:#059669,stroke:#10b981,stroke-width:2px,color:#d1fae5
-    classDef endNode fill:#16a34a,stroke:#22c55e,stroke-width:3px,color:#fff`,
+    classDef metricsNode fill:#7c3aed,stroke:#a78bfa,stroke-width:2px,color:#e9d5ff,min-width:400px
+    classDef outputNode fill:#059669,stroke:#10b981,stroke-width:2px,color:#d1fae5,min-width:400px
+    classDef endNode fill:#16a34a,stroke:#22c55e,stroke-width:3px,color:#fff,min-width:400px`,
       },
       {
         heading: "Output",

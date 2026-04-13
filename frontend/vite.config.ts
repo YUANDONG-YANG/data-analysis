@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import yaml from "js-yaml";
 import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
@@ -12,6 +13,8 @@ const repoRoot = path.resolve(__dirname, "..");
 const finalDataCsv = path.join(repoRoot, "data", "gold", "final_dataframe.csv");
 const pipelineStepsJson = path.join(repoRoot, "data", "gold", "pipeline_steps_report.json");
 const pipelineRuntimeJson = path.join(repoRoot, "data", "gold", "pipeline_runtime_status.json");
+const configYaml = path.join(repoRoot, "config.yaml");
+const bronzeDataPath = path.join(repoRoot, "data", "bronze");
 
 function pipelineStepsApiPlugin(): Plugin {
   let child: ChildProcessWithoutNullStreams | null = null;
@@ -145,6 +148,98 @@ function pipelineStepsApiPlugin(): Plugin {
       respondJson(res, 200, {
         ok: true,
         available: fs.existsSync(finalDataCsv),
+      });
+      return;
+    }
+
+    if (pathname === "/config.yaml") {
+      fs.readFile(configYaml, (err, data) => {
+        if (err) {
+          respondJson(res, 404, {
+            ok: false,
+            error: "file_not_found",
+            hint: "config.yaml not found in repository root",
+          });
+          return;
+        }
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/yaml; charset=utf-8");
+        res.end(data);
+      });
+      return;
+    }
+
+    if (pathname.startsWith("/data/bronze/")) {
+      const filename = pathname.replace("/data/bronze/", "");
+      const filePath = path.join(bronzeDataPath, filename);
+      fs.readFile(filePath, (err, data) => {
+        if (err) {
+          respondJson(res, 404, {
+            ok: false,
+            error: "file_not_found",
+            hint: `Bronze data file not found: ${filename}`,
+          });
+          return;
+        }
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.end(data);
+      });
+      return;
+    }
+
+    if (pathname === "/api/save-config" && req.method === "POST") {
+      let body = "";
+      req.on("data", (chunk) => {
+        body += chunk.toString();
+      });
+      req.on("end", () => {
+        try {
+          const newConfig = JSON.parse(body);
+          
+          // Read existing config
+          fs.readFile(configYaml, "utf8", (err, data) => {
+            if (err) {
+              respondJson(res, 500, {
+                ok: false,
+                error: "read_error",
+                message: "Failed to read config.yaml",
+              });
+              return;
+            }
+
+            // Parse YAML
+            const config = yaml.load(data) as any;
+
+            // Update community_names section
+            config.community_names = config.community_names || {};
+            config.community_names.aliases = newConfig.community_names.aliases;
+
+            // Write back to file
+            const updatedYaml = yaml.dump(config, { indent: 2, lineWidth: -1 });
+            fs.writeFile(configYaml, updatedYaml, "utf8", (writeErr) => {
+              if (writeErr) {
+                respondJson(res, 500, {
+                  ok: false,
+                  error: "write_error",
+                  message: "Failed to write config.yaml",
+                });
+                return;
+              }
+
+              respondJson(res, 200, {
+                ok: true,
+                message: "Configuration saved successfully",
+              });
+            });
+          });
+        } catch (parseErr) {
+          respondJson(res, 400, {
+            ok: false,
+            error: "invalid_json",
+            message: "Invalid JSON in request body",
+          });
+        }
       });
       return;
     }

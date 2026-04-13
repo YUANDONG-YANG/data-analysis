@@ -601,7 +601,7 @@ export function AnalysisReportPage() {
             />
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-2">
+          <section className="grid gap-6 lg:grid-cols-2">
             <ChartCard
               title="Current-period sales vs target"
               subtitle="This chart excludes future target-only months so actual performance and target volume share the same time window."
@@ -680,7 +680,7 @@ export function AnalysisReportPage() {
             </ChartCard>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-2">
+          <section className="grid gap-6 lg:grid-cols-2">
             <ChartCard
               title="Current-period achievement rate"
               subtitle="Target attainment stays on its own chart so it can use a wider percentage scale without compressing funnel-efficiency metrics."
@@ -764,12 +764,77 @@ export function AnalysisReportPage() {
             </ChartCard>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[1.35fr_1fr]">
+          <section className="grid gap-6 lg:grid-cols-2">
+            <ChartCard
+              title="Sales conversion funnel"
+              subtitle="Shows conversion efficiency from web traffic → CRM leads → actual sales (current period only)."
+            >
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart 
+                    data={[
+                      { 
+                        stage: 'Web Traffic', 
+                        count: currentTotals.traffic,
+                        rate: 100
+                      },
+                      { 
+                        stage: 'CRM Leads', 
+                        count: currentTotals.leads,
+                        rate: currentTotals.traffic > 0 ? (currentTotals.leads / currentTotals.traffic) * 100 : 0
+                      },
+                      { 
+                        stage: 'Actual Sales', 
+                        count: currentTotals.actualSales,
+                        rate: currentTotals.traffic > 0 ? (currentTotals.actualSales / currentTotals.traffic) * 100 : 0
+                      }
+                    ]}
+                    layout="vertical"
+                    margin={{ left: 20, right: 40 }}
+                  >
+                    <CartesianGrid stroke="rgba(255,255,255,0.08)" horizontal={false} />
+                    <XAxis 
+                      type="number" 
+                      stroke="#94a3b8" 
+                      tick={{ fontSize: 12 }}
+                      tickFormatter={(value) => compact(value)}
+                    />
+                    <YAxis 
+                      type="category" 
+                      dataKey="stage" 
+                      stroke="#94a3b8" 
+                      width={100}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (!active || !payload || !payload.length) return null;
+                        const data = payload[0].payload;
+                        return (
+                          <div className="rounded-lg border border-white/10 bg-canvas-elevated/95 px-3 py-2 shadow-xl backdrop-blur-sm">
+                            <p className="mb-1 text-xs font-medium text-ink">{data.stage}</p>
+                            <p className="text-sm font-semibold text-accent-glow">
+                              {DECIMAL_FORMATTER.format(data.count)} ({percent(data.rate)})
+                            </p>
+                          </div>
+                        );
+                      }}
+                    />
+                    <Bar dataKey="count" fill="#a78bfa" radius={[0, 6, 6, 0]}>
+                      {[0, 1, 2].map((index) => (
+                        <Cell key={index} fill={['#22d3ee', '#a78bfa', '#34d399'][index]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
+
             <ChartCard
               title="Top communities by actual sales"
               subtitle="Best for showing which communities contribute the most volume in the final integrated output."
             >
-              <div className="h-[28rem]">
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={topCommunities} layout="vertical" margin={{ left: 12, right: 12 }}>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" horizontal={false} />
@@ -796,57 +861,54 @@ export function AnalysisReportPage() {
                 </ResponsiveContainer>
               </div>
             </ChartCard>
+            <ChartCard
+              title="Builder sales and target"
+              subtitle="Builder comparison is based on the current operating period only, so future planning targets do not distort the columns."
+            >
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={builderSeries}>
+                    <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
+                    <XAxis dataKey="builder" stroke="#94a3b8" tick={{ fontSize: 12 }} />
+                    <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      content={<ChartTooltip kind="number" />}
+                    />
+                    <Legend />
+                    <Bar dataKey="actual_sales" name="Actual sales" fill="#38bdf8" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="target_sales" name="Target sales" fill="#34d399" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
 
-            <div className="space-y-6">
-              <ChartCard
-                title="Builder sales and target"
-                subtitle="Builder comparison is based on the current operating period only, so future planning targets do not distort the columns."
-              >
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={builderSeries}>
-                      <CartesianGrid stroke="rgba(255,255,255,0.08)" vertical={false} />
-                      <XAxis dataKey="builder" stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                      <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
-                      <Tooltip
-                        content={<ChartTooltip kind="number" />}
-                      />
-                      <Legend />
-                      <Bar dataKey="actual_sales" name="Actual sales" fill="#38bdf8" radius={[6, 6, 0, 0]} />
-                      <Bar dataKey="target_sales" name="Target sales" fill="#34d399" radius={[6, 6, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </ChartCard>
-
-              <ChartCard
-                title="Revenue share by builder"
-                subtitle="Useful when presenting which builder contributes most of the modeled revenue."
-              >
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={builderRevenueShare}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={72}
-                        outerRadius={108}
-                        paddingAngle={2}
-                      >
-                        {builderRevenueShare.map((entry, index) => (
-                          <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        content={<ChartTooltip kind="currency" />}
-                      />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </ChartCard>
-            </div>
+            <ChartCard
+              title="Revenue share by builder"
+              subtitle="Useful when presenting which builder contributes most of the modeled revenue."
+            >
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={builderRevenueShare}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={72}
+                      outerRadius={108}
+                      paddingAngle={2}
+                    >
+                      {builderRevenueShare.map((entry, index) => (
+                        <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      content={<ChartTooltip kind="currency" />}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </ChartCard>
           </section>
 
           <section className="grid gap-4 sm:grid-cols-3">

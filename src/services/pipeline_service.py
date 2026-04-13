@@ -55,6 +55,55 @@ class PipelineService:
         self.run_mode = os.getenv('PIPELINE_MODE', 'local_demo')
         self.environment = os.getenv('ENVIRONMENT', 'dev')
     
+    def _clean_gold_layer(self) -> None:
+        """
+        Clean all files in the Gold layer (output directory) before starting pipeline.
+        
+        This ensures a fresh start for each pipeline run and prevents stale data.
+        """
+        try:
+            if not self.output_path.exists():
+                self.logger.info(
+                    "Gold layer directory does not exist, skipping cleanup",
+                    extra={'context': {'output_path': str(self.output_path)}}
+                )
+                return
+            
+            cleaned_files = []
+            for file_path in self.output_path.iterdir():
+                if file_path.is_file():
+                    try:
+                        file_path.unlink()
+                        cleaned_files.append(file_path.name)
+                    except Exception as e:
+                        self.logger.warning(
+                            f"Failed to delete file {file_path.name}: {e}",
+                            extra={'context': {'file': str(file_path), 'error': str(e)}}
+                        )
+            
+            if cleaned_files:
+                self.logger.info(
+                    f"Cleaned {len(cleaned_files)} file(s) from Gold layer",
+                    extra={
+                        'context': {
+                            'output_path': str(self.output_path),
+                            'cleaned_files': cleaned_files,
+                            'count': len(cleaned_files)
+                        }
+                    }
+                )
+            else:
+                self.logger.info(
+                    "Gold layer is already clean (no files to remove)",
+                    extra={'context': {'output_path': str(self.output_path)}}
+                )
+                
+        except Exception as e:
+            self.logger.warning(
+                f"Error during Gold layer cleanup: {e}",
+                extra={'context': {'output_path': str(self.output_path), 'error': str(e)}}
+            )
+    
     def execute(self) -> pd.DataFrame:
         """
         Execute the complete data integration pipeline.
@@ -117,6 +166,10 @@ class PipelineService:
                     }
                 }
             )
+            
+            # Clean Gold layer before starting
+            self._clean_gold_layer()
+            
             persist_runtime_status("starting")
             
             # Step 1: Load and process sales data
