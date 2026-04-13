@@ -2,6 +2,7 @@
 Factory for creating service instances.
 """
 from typing import Optional
+from pathlib import Path
 
 from ..services import DataService, MetricsService, PipelineService
 from ..repositories import FileRepository, APIRepository
@@ -16,7 +17,8 @@ class ServiceFactory:
     def create_data_service(
         file_repository: FileRepository,
         api_repository: Optional[APIRepository],
-        data_processor: IDataProcessor
+        data_processor: IDataProcessor,
+        processed_path: Optional[Path] = None
     ) -> DataService:
         """
         Create data service instance.
@@ -25,11 +27,12 @@ class ServiceFactory:
             file_repository: File repository instance
             api_repository: API repository instance (optional)
             data_processor: Data processor instance
+            processed_path: Path to Silver layer (processed data) directory
             
         Returns:
             DataService instance
         """
-        return DataService(file_repository, api_repository, data_processor)
+        return DataService(file_repository, api_repository, data_processor, processed_path)
     
     @staticmethod
     def create_metrics_service(

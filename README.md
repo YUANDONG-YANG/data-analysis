@@ -27,9 +27,9 @@ real-estate-heterogeneous-analytics/
 ├── requirements.txt
 ├── config.yaml
 ├── data/
-│   ├── raw/          # Source data (read-only)
-│   ├── processed/    # Inputs used by the pipeline (see config paths)
-│   └── output/       # Generated reports
+│   ├── bronze/       # 🥉 Bronze layer: Raw source data (read-only)
+│   ├── silver/       # 🥈 Silver layer: Cleaned & standardized data
+│   └── gold/         # 🥇 Gold layer: Business-aggregated reports
 └── src/
     ├── main.py       # Entry point
     ├── core/
@@ -38,6 +38,38 @@ real-estate-heterogeneous-analytics/
     ├── factories/
     └── di/
 ```
+
+## Data Architecture (Medallion Pattern)
+
+This project follows the **Medallion Architecture** with three data quality layers:
+
+### 🥉 Bronze Layer (`data/bronze/`)
+- **Purpose**: Raw data ingestion zone
+- **Characteristics**: Immutable source files, no transformations
+- **Contents**:
+  - `sales_builder_a.csv`, `sales_builder_b.csv` - Raw sales records
+  - `target_sales_builder_a.xlsx`, `target_sales_builder_b.csv` - Raw target data
+- **Used by**: `FileRepository`, `APIRepository`
+
+### 🥈 Silver Layer (`data/silver/`)
+- **Purpose**: Cleaned and standardized zone
+- **Characteristics**: Deduplicated, outlier-filtered, date/community standardized
+- **Contents** (generated after pipeline execution):
+  - `sales_processed.csv` - Cleaned sales with standardized dates and communities
+  - `targets_processed.csv` - Cleaned targets with normalized communities
+  - `crm_processed.csv` - Standardized CRM leads with unified date formats
+  - `web_traffic_processed.csv` - Processed web traffic with community mapping
+- **Used by**: Intermediate storage for audit, debugging, and downstream analysis
+
+### 🥇 Gold Layer (`data/gold/`)
+- **Purpose**: Business-aggregated reporting zone
+- **Characteristics**: Final metrics table (month × community × builder)
+- **Contents**:
+  - `final_dataframe.csv` - Final metrics with KPIs and derived rates
+  - `pipeline_analysis_report.html` - Quality report and execution summary
+  - `pipeline_steps_report.json` - Detailed step-by-step execution log
+  - `pipeline_runtime_status.json` - Real-time pipeline status for frontend
+- **Used by**: Analytics dashboards, business intelligence tools, downstream systems
 
 ## Installation
 
@@ -67,7 +99,7 @@ From the repository root:
 python -m src.main
 ```
 
-This generates the latest output files under `data/output/`, including:
+This generates the latest output files under `data/gold/`, including:
 
 - `final_dataframe.csv`
 - `pipeline_analysis_report.html`

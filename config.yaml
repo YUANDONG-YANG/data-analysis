@@ -7,10 +7,26 @@ api:
     crm: "/crm"
     web_traffic: "/web-traffic"
 
+# Data layer architecture (Medallion Architecture pattern)
+# Three-tier data pipeline: Bronze → Silver → Gold
 data:
-  raw_path: "data/processed"
-  processed_path: "data/processed"
-  output_path: "data/output"
+  # 🥉 Bronze layer: Raw ingestion zone
+  # - Immutable source data from files and APIs
+  # - No transformations, preserves original format
+  # - Used by FileRepository and APIRepository
+  raw_path: "data/bronze"
+  
+  # 🥈 Silver layer: Cleaned and standardized zone
+  # - Deduplicated, outlier-filtered, date/community standardized
+  # - Business-ready DataFrames after DataProcessor transformation
+  # - Intermediate storage for audit and debugging
+  processed_path: "data/silver"
+  
+  # 🥇 Gold layer: Business-aggregated reporting zone
+  # - Final metrics table: month × community × builder
+  # - Consumed by analytics, dashboards, and downstream systems
+  # - Includes final_dataframe.csv, quality reports, and checksums
+  output_path: "data/gold"
 
 logging:
   level: "INFO"

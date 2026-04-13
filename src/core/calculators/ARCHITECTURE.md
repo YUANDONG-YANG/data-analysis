@@ -21,19 +21,43 @@ classDiagram
     IMetricsCalculator <.. MetricsCalculator : implements
 ```
 
-## Metrics flow (diagram)
+## Metrics architecture (diagram)
 
 ```mermaid
-flowchart TD
-    A[Four input tables] --> B{sales & targets both empty?}
-    B -->|yes| Z[empty result schema]
-    B -->|no| C[groupby sales: actual + revenue]
-    C --> D[groupby targets]
-    D --> E[groupby CRM leads]
-    E --> F[groupby traffic]
-    F --> G[outer merge sales + targets]
-    G --> H[left merge leads + traffic]
-    H --> I[fillna 0 + derived ratios]
-    I --> J[rename columns + sort]
-    J --> K[wide output table]
+flowchart TB
+    subgraph Orchestration["Orchestration layer"]
+        PS[PipelineService]
+    end
+
+    subgraph Application["Application service layer"]
+        MS[MetricsService]
+    end
+
+    subgraph Contract["Core contract · Protocol"]
+        IMC{{IMetricsCalculator}}
+    end
+
+    subgraph Domain["Domain calculation layer"]
+        MC[MetricsCalculator]
+    end
+
+    subgraph Inputs["Processed input DataFrames<br/><i>produced by DataService</i>"]
+        SALES[(sales_df)]
+        TARGETS[(targets_df)]
+        CRM[(crm_df)]
+        TRAFFIC[(web_traffic_df)]
+    end
+
+    subgraph Output["Reporting output"]
+        RESULT[(monthly metrics DataFrame)]
+    end
+
+    PS -->|calls calculate_metrics| MS
+    MS -.->|depends on via DI| IMC
+    MC -.->|implements| IMC
+    SALES --> MC
+    TARGETS --> MC
+    CRM --> MC
+    TRAFFIC --> MC
+    MC --> RESULT
 ```

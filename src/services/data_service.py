@@ -3,6 +3,7 @@ Data service for business logic related to data operations.
 """
 import logging
 import pandas as pd
+from pathlib import Path
 from typing import List, Optional
 from ..core.interfaces import IDataProcessor
 from ..core.exceptions import DataProcessError
@@ -19,7 +20,8 @@ class DataService:
         self,
         file_repository: FileRepository,
         api_repository: Optional[APIRepository],
-        data_processor: IDataProcessor
+        data_processor: IDataProcessor,
+        processed_path: Optional[Path] = None
     ):
         """
         Initialize data service.
@@ -28,10 +30,48 @@ class DataService:
             file_repository: File-based data repository
             api_repository: API-based data repository (optional)
             data_processor: Data processor instance
+            processed_path: Path to Silver layer (processed data) directory
         """
         self.file_repository = file_repository
         self.api_repository = api_repository
         self.data_processor = data_processor
+        self.processed_path = processed_path
+        
+        # Create processed directory if path is provided
+        if self.processed_path:
+            self.processed_path.mkdir(parents=True, exist_ok=True)
+    
+    def _save_to_silver_layer(self, df: pd.DataFrame, filename: str) -> None:
+        """
+        Save DataFrame to Silver layer (processed data zone).
+        
+        Args:
+            df: DataFrame to save
+            filename: Output filename (e.g., 'sales_processed.csv')
+        """
+        if not self.processed_path or df.empty:
+            return
+        
+        try:
+            output_file = self.processed_path / filename
+            df.to_csv(output_file, index=False)
+            _logger.info(
+                f"Silver layer output saved: {filename}",
+                extra={
+                    'context': {
+                        'layer': 'silver',
+                        'filename': filename,
+                        'records': len(df),
+                        'columns': len(df.columns),
+                        'path': str(output_file)
+                    }
+                }
+            )
+        except Exception as e:
+            _logger.warning(
+                f"Failed to save Silver layer output {filename}: {e}",
+                extra={'context': {'layer': 'silver', 'filename': filename, 'error': str(e)}}
+            )
     
     def load_and_process_sales_data(self) -> pd.DataFrame:
         """
@@ -53,6 +93,10 @@ class DataService:
             out = self.data_processor.process_sales_data(cleaned)
             snap_o = dataframe_snapshot(out, "sales_final")
             log_internal_transition(_logger, "sales", "clean → process_sales_data", snap_c, snap_o)
+            
+            # Save to Silver layer (processed data zone)
+            self._save_to_silver_layer(out, "sales_processed.csv")
+            
             return out
         except Exception as e:
             raise DataProcessError(f"Failed to load and process sales data: {e}")
@@ -77,6 +121,10 @@ class DataService:
             out = self.data_processor.process_targets_data(cleaned)
             snap_o = dataframe_snapshot(out, "targets_final")
             log_internal_transition(_logger, "targets", "clean → process_targets_data", snap_c, snap_o)
+            
+            # Save to Silver layer (processed data zone)
+            self._save_to_silver_layer(out, "targets_processed.csv")
+            
             return out
         except Exception as e:
             raise DataProcessError(f"Failed to load and process targets data: {e}")
@@ -123,6 +171,9 @@ class DataService:
                 extra={'context': {'data_type': 'crm', 'processed_records': len(processed)}}
             )
             
+            # Save to Silver layer (processed data zone)
+            self._save_to_silver_layer(processed, "crm_processed.csv")
+            
             return processed
         except Exception as e:
             # Log warning but return empty DataFrame (graceful degradation)
@@ -162,7 +213,12 @@ class DataService:
             if merged.empty:
                 return pd.DataFrame()
             
-            return self.data_processor.process_web_traffic_data(merged)
+            processed = self.data_processor.process_web_traffic_data(merged)
+            
+            # Save to Silver layer (processed data zone)
+            self._save_to_silver_layer(processed, "web_traffic_processed.csv")
+            
+            return processed
         except Exception as e:
             # Log warning but return empty DataFrame (graceful degradation)
             logger = logging.getLogger(__name__)

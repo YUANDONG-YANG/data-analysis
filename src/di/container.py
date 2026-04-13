@@ -64,11 +64,15 @@ class DIContainer:
         file_repository = RepositoryFactory.create_file_repository(self.config)
         api_repository = RepositoryFactory.create_api_repository(self.config, api_client)
         
+        # Get processed path for Silver layer
+        processed_path = self.config.data.get_processed_path(self.config.project_root)
+        
         # Create services
         data_service = ServiceFactory.create_data_service(
             file_repository,
             api_repository,
-            data_processor
+            data_processor,
+            processed_path
         )
         
         metrics_service = ServiceFactory.create_metrics_service(metrics_calculator)

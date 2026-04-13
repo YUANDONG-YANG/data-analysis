@@ -41,9 +41,16 @@ ENV/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data outputs (keep input data tracked; ignore generated artifacts)
-data/output/
-data/output/*.csv
+# Data outputs (Medallion Architecture layers)
+# Bronze layer (data/bronze/) - tracked in git (raw source data)
+# Silver layer (data/silver/) - ignored (generated cleaned data)
+# Gold layer (data/gold/) - ignored (generated final reports)
+data/silver/
+data/silver/*.csv
+data/gold/
+data/gold/*.csv
+data/gold/*.html
+data/gold/*.json
 
 # Logs
 *.log

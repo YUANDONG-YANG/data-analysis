@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply bg-canvas text-ink font-sans min-h-screen;
+    background-image: radial-gradient(
+        ellipse 90% 55% at 50% -15%,
+        rgba(59, 130, 246, 0.14),
+        transparent
+      ),
+      radial-gradient(ellipse 50% 45% at 100% 0%, rgba(124, 58, 237, 0.1), transparent);
+    background-attachment: fixed;
+  }
+  ::selection {
+    background-color: rgba(56, 189, 248, 0.35);
+    color: hsl(210 30% 96%);
+  }
+}
+
+/* Mermaid: blend diagrams into the dark product canvas */
+.diagram-surface svg {
+  background: transparent;
+}
+
+.diagram-surface svg .nodeLabel,
+.diagram-surface svg .edgeLabel,
+.diagram-surface svg .label text {
+  fill: #e5eefc;
+}
+
+.diagram-surface svg .cluster-label text,
+.diagram-surface svg .cluster span,
+.diagram-surface svg .edgeLabel span {
+  color: #dbe7f8;
+}
+
+/* Custom scrollbar for data preview table */
+.data-preview-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.data-preview-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.data-preview-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.data-preview-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.data-preview-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox scrollbar */
+.data-preview-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}

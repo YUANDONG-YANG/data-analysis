@@ -23,11 +23,71 @@ class DataProcessor:
         """
         cn = community_names if community_names is not None else CommunityNamesConfig()
         self._community_aliases = dict(cn.aliases)
+        self._community_lookup = self._build_community_lookup(cn)
         self._path_slugs_sorted = sorted(
             (s.strip() for s in cn.path_slugs if s and str(s).strip()),
             key=lambda s: len(str(s)),
             reverse=True,
         )
+
+    @staticmethod
+    def _normalize_lookup_key(name: str) -> str:
+        """Normalize a community label to a punctuation-insensitive lookup key."""
+        candidate = str(name).strip().casefold()
+        candidate = re.sub(r'\s+community\s*$', '', candidate, flags=re.IGNORECASE)
+        candidate = re.sub(r'\s*-\s*phase\s*\d+\s*$', '', candidate, flags=re.IGNORECASE)
+        candidate = re.sub(r'\s*\([^)]*\)', '', candidate)
+        candidate = re.sub(r'[^a-z0-9]+', '', candidate)
+        return candidate
+
+    def _build_community_lookup(self, cn: CommunityNamesConfig) -> dict:
+        """Create a resilient lookup table from aliases, canonical names, and URL slugs."""
+        lookup = {}
+        canonical_names = {
+            str(value).strip()
+            for value in cn.aliases.values()
+            if str(value).strip()
+        }
+        canonical_names.update(
+            str(slug).replace("-", " ").title().strip()
+            for slug in cn.path_slugs
+            if str(slug).strip()
+        )
+
+        for canonical in canonical_names:
+            key = self._normalize_lookup_key(canonical)
+            if key:
+                lookup[key] = canonical
+
+        for variant, canonical in cn.aliases.items():
+            key = self._normalize_lookup_key(variant)
+            if key:
+                lookup[key] = str(canonical).strip()
+
+        return lookup
+
+    def _resolve_canonical_community(self, name: str) -> Optional[str]:
+        """Resolve a candidate community label to a canonical name if known."""
+        candidate = str(name).strip()
+        if not candidate:
+            return None
+        if candidate in self._community_aliases:
+            return str(self._community_aliases[candidate]).strip()
+        key = self._normalize_lookup_key(candidate)
+        return self._community_lookup.get(key)
+
+    @staticmethod
+    def _unique_candidates(values: List[str]) -> List[str]:
+        """Preserve order while removing empty / duplicate candidate values."""
+        seen = set()
+        result = []
+        for value in values:
+            item = str(value).strip()
+            if not item or item in seen:
+                continue
+            seen.add(item)
+            result.append(item)
+        return result
     
     @classmethod
     def from_config(cls, config: "AppConfig") -> "DataProcessor":
@@ -97,22 +157,28 @@ class DataProcessor:
         """
         if pd.isna(name):
             return None
-        
-        name = str(name).strip()
-        
-        # Remove "Community" suffix (e.g., "Fairview Estates Community" -> "Fairview Estates")
-        name = re.sub(r'\s+Community\s*$', '', name, flags=re.IGNORECASE)
-        
-        # Handle common variants
-        name = re.sub(r'\s*-\s*Phase\s*\d+', '', name, flags=re.IGNORECASE)
-        name = re.sub(r'\s*\([^)]*\)', '', name)
-        name = re.sub(r'\s*-\s*[^-]*$', '', name)
-        
-        for variant, canonical in self._community_aliases.items():
-            if variant in name:
-                name = name.replace(variant, canonical)
-        
-        return name.strip()
+
+        raw_name = re.sub(r'\s+', ' ', str(name).strip())
+        candidates = [raw_name]
+
+        no_community = re.sub(r'\s+Community\s*$', '', raw_name, flags=re.IGNORECASE).strip()
+        candidates.append(no_community)
+
+        no_parens = re.sub(r'\s*\([^)]*\)', '', no_community).strip()
+        candidates.append(no_parens)
+
+        no_phase = re.sub(r'\s*-\s*Phase\s*\d+\s*$', '', no_parens, flags=re.IGNORECASE).strip()
+        candidates.append(no_phase)
+
+        if " - " in no_phase:
+            candidates.append(re.split(r'\s+-\s+', no_phase, maxsplit=1)[0].strip())
+
+        for candidate in self._unique_candidates(candidates):
+            canonical = self._resolve_canonical_community(candidate)
+            if canonical:
+                return canonical
+
+        return no_phase or raw_name or None
     
     def merge_dataframes(self, dataframes: List[pd.DataFrame], 
                         how: str = 'outer', on: Optional[str] = None) -> pd.DataFrame:
