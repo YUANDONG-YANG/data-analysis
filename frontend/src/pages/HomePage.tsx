@@ -84,6 +84,12 @@ export function HomePage() {
           >
             Pipeline step demo (latest run)
           </Link>
+          <Link
+            to="/delta"
+            className={`${homeCtaClass} border border-teal-500/40 bg-teal-500/10 text-teal-100 hover:border-teal-400/60 hover:bg-teal-500/15`}
+          >
+            Delta Lake demo
+          </Link>
           {finalOutputStatus.available && (
             <Link
               to="/analysis-report"

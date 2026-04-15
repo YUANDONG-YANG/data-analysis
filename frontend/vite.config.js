@@ -10,6 +10,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const finalDataCsv = path.join(repoRoot, "data", "gold", "final_dataframe.csv");
 const pipelineStepsJson = path.join(repoRoot, "data", "gold", "pipeline_steps_report.json");
 const pipelineRuntimeJson = path.join(repoRoot, "data", "gold", "pipeline_runtime_status.json");
+const deltaSnapshotJson = path.join(repoRoot, "data", "gold", "delta_snapshot.json");
 const configYaml = path.join(repoRoot, "config.yaml");
 const bronzeDataPath = path.join(repoRoot, "data", "bronze");
 function pipelineStepsApiPlugin() {
@@ -50,6 +51,21 @@ function pipelineStepsApiPlugin() {
                         ok: false,
                         error: "file_not_found",
                         hint: "Run: python -m src.main (writes data/gold/pipeline_steps_report.json)",
+                    });
+                    return;
+                }
+                res.setHeader("Content-Type", "application/json; charset=utf-8");
+                res.end(data);
+            });
+            return;
+        }
+        if (pathname === "/api/delta-snapshot.json") {
+            fs.readFile(deltaSnapshotJson, (err, data) => {
+                if (err) {
+                    respondJson(res, 404, {
+                        ok: false,
+                        error: "file_not_found",
+                        hint: "Emit data/gold/delta_snapshot.json from the pipeline after Delta integration, or use the bundled sample on the Delta page.",
                     });
                     return;
                 }

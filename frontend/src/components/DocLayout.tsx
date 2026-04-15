@@ -3,6 +3,10 @@ import clsx from "clsx";
 import { tourSteps } from "../content/pipelineContent";
 import { useFinalOutputStatus } from "../hooks/useFinalOutputStatus";
 
+/** Fixed-width slot so nav labels align regardless of glyph width (▶ vs Δ vs ▣). */
+const navIconClass =
+  "inline-flex h-5 w-5 flex-shrink-0 items-center justify-center font-mono text-[0.7rem] leading-none text-ink-faint";
+
 export function DocLayout() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,8 +40,10 @@ export function DocLayout() {
                   : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
               )}
             >
-              <span className="font-mono text-[0.7rem] text-ink-faint">⚙</span>
-              <span className="font-medium">Data mapping config</span>
+              <span className={navIconClass} aria-hidden>
+                ⚙
+              </span>
+              <span className="min-w-0 font-medium">Data mapping config</span>
             </Link>
           </div>
           <p className="mb-2 px-3 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-ink-faint">
@@ -53,8 +59,10 @@ export function DocLayout() {
                   : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
               )}
             >
-              <span className="font-mono text-[0.7rem] text-ink-faint">▶</span>
-              <span className="font-medium">Pipeline step demo</span>
+              <span className={navIconClass} aria-hidden>
+                ▶
+              </span>
+              <span className="min-w-0 font-medium">Pipeline step demo</span>
             </Link>
             {showOutputDashboard && (
               <Link
@@ -66,10 +74,26 @@ export function DocLayout() {
                     : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
                 )}
               >
-                <span className="font-mono text-[0.7rem] text-ink-faint">▣</span>
-                <span className="font-medium">Output dashboard</span>
+                <span className={navIconClass} aria-hidden>
+                  ▣
+                </span>
+                <span className="min-w-0 font-medium">Output dashboard</span>
               </Link>
             )}
+            <Link
+              to="/delta"
+              className={clsx(
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                location.pathname === "/delta"
+                  ? "bg-teal-500/10 text-teal-200 shadow-[inset_0_0_0_1px_hsl(173_80%_40%_/_0.35)]"
+                  : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
+              )}
+            >
+              <span className={navIconClass} aria-hidden>
+                Δ
+              </span>
+              <span className="min-w-0 font-medium">Delta Lake</span>
+            </Link>
             <Link
               to="/integration-capabilities"
               className={clsx(
@@ -79,8 +103,10 @@ export function DocLayout() {
                   : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
               )}
             >
-              <span className="font-mono text-[0.7rem] text-ink-faint">◎</span>
-              <span className="font-medium">Integration capabilities</span>
+              <span className={navIconClass} aria-hidden>
+                ◎
+              </span>
+              <span className="min-w-0 font-medium">Integration capabilities</span>
             </Link>
           </div>
           <p className="mb-2 px-3 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-ink-faint">
@@ -94,7 +120,7 @@ export function DocLayout() {
                   <Link
                     to={step.path}
                     className={clsx(
-                      "group flex items-baseline gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
+                      "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
                       active
                         ? "bg-accent/10 text-accent-glow shadow-[inset_0_0_0_1px_hsl(199_89%_48%_/_0.25)]"
                         : "text-ink-muted hover:bg-white/[0.04] hover:text-ink",
@@ -102,13 +128,13 @@ export function DocLayout() {
                   >
                     <span
                       className={clsx(
-                        "font-mono text-[0.7rem] tabular-nums",
+                        "inline-flex min-w-[2.25rem] flex-shrink-0 justify-end font-mono text-[0.7rem] tabular-nums leading-none",
                         active ? "text-accent" : "text-ink-faint group-hover:text-ink-muted",
                       )}
                     >
                       {step.number}
                     </span>
-                    <span className="font-medium">{step.title}</span>
+                    <span className="min-w-0 font-medium">{step.title}</span>
                   </Link>
                 </li>
               );
@@ -132,6 +158,8 @@ export function DocLayout() {
               ? "/data-mapping"
               : location.pathname === "/live-demo"
                 ? "/live-demo"
+              : location.pathname === "/delta"
+                ? "/delta"
               : showOutputDashboard && location.pathname === "/analysis-report"
                 ? "/analysis-report"
               : location.pathname === "/integration-capabilities"
@@ -145,6 +173,7 @@ export function DocLayout() {
           <option value="/">Home</option>
           <option value="/data-mapping">⚙ Data mapping config</option>
           <option value="/live-demo">Pipeline step demo</option>
+          <option value="/delta">Delta Lake</option>
           {showOutputDashboard && <option value="/analysis-report">Output dashboard</option>}
           <option value="/integration-capabilities">Integration capabilities</option>
           {tourSteps.map((s) => (
